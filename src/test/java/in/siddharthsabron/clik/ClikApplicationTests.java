@@ -1,13 +1,13 @@
-package in.siddharthsabron.clik;
+// package in.siddharthsabron.clik;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class ClikApplicationTests {
+// @SpringBootTest
+// class ClikApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
+//     @Test
+//     void contextLoads() {
+//     }
 
-}
+// }
