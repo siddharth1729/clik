@@ -12,13 +12,18 @@
     <artifactId>clik</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>clik</name>
-    <description>clik</description>
+    <description>A Self Deployable Url Shortner</description>
     <url/>
     <licenses>
         <license/>
     </licenses>
     <developers>
-        <developer/>
+        <developer>
+            <id>siddharthsabron</id>
+            <name>siddharth sabron</name>
+            <email>siddharth.sabron@gmail.com</email>
+            <url>https://siddharthsabron.in</url>
+        </developer>
     </developers>
     <scm>
         <connection/>
