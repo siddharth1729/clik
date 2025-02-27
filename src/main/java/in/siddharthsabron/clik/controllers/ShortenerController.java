@@ -1,8 +1,10 @@
 package in.siddharthsabron.clik.controllers;
 
-import in.siddharthsabron.clik.data.ShortenRequest;
+import in.siddharthsabron.clik.dto.ShortenRequest;
 import in.siddharthsabron.clik.services.ShortenerService;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,26 +20,36 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class ShortenerController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ShortenerController.class);
+
     @Autowired
     private ShortenerService shortenerService;
 
     /**
-     * Shortens a long URL.
-     * Requires a logged-in user (userId obtained from the session).
+     * Shortens a long URL.  Can be used with or without a logged-in user.
      *
      * @param request The request body containing the long URL.
-     * @param session The HTTP session.
-     * @return A ResponseEntity containing the short URL or an error message.
+     * @param session The HTTP session (used to get the userId, if present).
+     * @return A ResponseEntity containing the short URL.
      */
     @PostMapping("/shorten")
     public ResponseEntity<String> shortenUrl(@RequestBody ShortenRequest request, HttpSession session) {
+        logger.info("Received shorten URL request");
         Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
-            return new ResponseEntity<>("User not logged in", HttpStatus.UNAUTHORIZED);
+        String shortCode;
+
+        if (userId != null) {
+            // User is logged in
+            shortCode = shortenerService.shortenUrl(request.getLongUrl(), userId);
+            logger.info("Shortened URL created: {} for userId: {}", shortCode, userId);
+        } else {
+            // Anonymous user
+            userId = (long) 0;
+            shortCode = shortenerService.shortenUrl(request.getLongUrl(), userId);
+            logger.info("Shortened URL created: {} for userId: {}", shortCode, userId);
         }
 
-        String shortCode = shortenerService.shortenUrl(request.getLongUrl(), userId);
-        String shortUrl = "http://localhost:8080/s/" + shortCode; // Replace with your domain
+        String shortUrl = "http://localhost:8080/s/" + shortCode;
         return new ResponseEntity<>(shortUrl, HttpStatus.OK);
     }
 
@@ -49,11 +61,13 @@ public class ShortenerController {
      */
     @GetMapping("/s/{shortCode}")
     public RedirectView redirect(@PathVariable String shortCode) {
+        logger.info("====Redirecting short code: {} to long URL", shortCode);
         Optional<String> longUrl = shortenerService.getLongUrl(shortCode);
         if (longUrl.isPresent()) {
             return new RedirectView(longUrl.get());
         } else {
-            return new RedirectView("/404"); // Redirect to a 404 page (you'll need to create this)
+            logger.warn("Short code not found: {}", shortCode);
+            return new RedirectView("/404");
         }
     }
 }
