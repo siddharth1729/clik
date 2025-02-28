@@ -2,7 +2,7 @@ package in.siddharthsabron.clik.services;
 
 import in.siddharthsabron.clik.models.links.ShortUrl;
 import in.siddharthsabron.clik.repositories.ShortUrlRepository;
-import in.siddharthsabron.clik.repositories.UserRepository;
+//import in.siddharthsabron.clik.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,8 +41,8 @@ public class ShortenerService {
     @Autowired
     private ShortUrlRepository shortUrlRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    //@Autowired
+    //private UserRepository userRepository;
 
     private final AtomicInteger sequence = new AtomicInteger(0);
     private final long epoch = 1672531200000L; // Example epoch

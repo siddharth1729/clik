@@ -1,4 +1,4 @@
-package in.siddharthsabron.clik.config; // Put this in a config package
+package in.siddharthsabron.clik.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,12 +15,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authorize) -> authorize
-                    .requestMatchers(new AntPathRequestMatcher("/api/users/register")).permitAll() // Allow anonymous access to user registration
-                    .requestMatchers(new AntPathRequestMatcher("/api/shorten")).permitAll() // Allow anonymous access to /api/shorten
-                    .requestMatchers(new AntPathRequestMatcher("/s/**")).permitAll()       // Allow access to short URLs
-                    .anyRequest().authenticated() // Require authentication for all other requests
+                    .requestMatchers(new AntPathRequestMatcher("/api/users/register")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/api/shorten")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/s/**")).permitAll()
+                    .anyRequest().authenticated()
             )
-            .csrf((csrf) -> csrf.disable()); // Disable CSRF for this example
+            .csrf((csrf) -> csrf.disable());
 
         return http.build();
     }
