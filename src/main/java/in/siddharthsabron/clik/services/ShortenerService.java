@@ -13,7 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+//import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import in.siddharthsabron.clik.models.authentications.User;
 import org.slf4j.Logger;
@@ -128,9 +128,9 @@ public class ShortenerService {
         return shortUrlRepository.findByInternalId(internalId)
             .map(shortUrl -> {
                 // Increment click count asynchronously if needed
-                logger.info("Incrementing click count for short URL: {}", shortUrl);
+                logger.info("=====Incrementing click count for short URL: {}", shortUrl);
                 incrementClickCountAsync(shortUrl.getShardId(), internalId);
-                logger.info("Returning long URL: {}", shortUrl.getLongUrl());
+                logger.info("=====Returning long URL: {}", shortUrl.getLongUrl());
                 return shortUrl.getLongUrl();
             });
     }
@@ -143,35 +143,146 @@ public class ShortenerService {
      * @param internalId The internal ID of the short URL.
      */
     private void incrementClickCountAsync(Integer shardId, Long internalId) {
-        // Submit a task to the thread pool
-       Future<?> future = executorService.submit(() -> { // Note the Future<?>
+        logger.info("=====Incrementing click count for shardId: {}, ===== internalId: {}", shardId, internalId);
+        executorService.submit(() -> {
             try {
-                shortUrlRepository.incrementClickCount(shardId, internalId);
+                int updatedRows = shortUrlRepository.incrementClickCount(shardId, internalId);
+                if (updatedRows > 0) {
+                    logger.info("=====Successfully incremented click count for shardId: {}, internalId: {}", shardId, internalId);
+                } else {
+                    logger.warn("=====No rows updated when incrementing click count for shardId: {}, internalId: {}", shardId, internalId);
+                }
             } catch (Exception e) {
-                logger.error("Error incrementing click count", e);
+                logger.error("=====Error incrementing click count for shardId: {}, internalId: {}", shardId, internalId, e);
             }
         });
-
-        // You can optionally check the status of the task later:
-         try {
-             future.get(); // This will block until the task completes (or throws an exception)
-         } catch (InterruptedException | java.util.concurrent.ExecutionException e) {
-             logger.error("Error waiting for click count update", e);
-         }
     }
 
 
     /**
-     * Generates a unique internal ID using a Snowflake-like approach.
+     * Generates a unique internal ID using a Snowflake-like approach. This method is designed
+     * to create unique IDs across a distributed system without relying on a central
+     * coordinating service (like an auto-incrementing database column).
      *
-     * @param shardId The shard ID.
-     * @return The generated internal ID.
+     * The generated ID is a 64-bit long integer, structured as follows:
+     *
+     *   +-------------------------------------------------------------------------------------------------------------------+
+     *   | Timestamp (41 bits)                   |       ShardID(10)      |      Sequence(12)   |                            |
+     *   +---------------------------------------+------------------------+---------------------+----------------------------+
+     *   |                   63                  |     22                 |           12        |     0  (Bit positions)     |
+     *   +-------------------------------------------------------------------------------------------------------------------+
+     * 1. Timestamp (41 bits):
+     *    - Represents the milliseconds elapsed since a custom epoch (in this case,
+     *      2023-01-01 00:00:00 UTC, defined by the 'epoch' variable). Using 41 bits
+     *      allows for 2^41 milliseconds, which is approximately 69.7 years.
+     *    - Calculation:  `System.currentTimeMillis() - epoch`
+     *    - Example: If the current time is 2024-03-01 10:30:15.500 UTC, and the epoch
+     *      is 2023-01-01 00:00:00.000 UTC, the timestamp would be 39,486,615,500 milliseconds.
+     *    - Lifespan:  The 41 bits provide a lifespan of approximately 69.7 years before
+     *      the timestamp wraps around.  Beyond this, you'd need a strategy to avoid
+     *      collisions (new epoch, re-sharding, etc.).
+     *      2^41 milliseconds = 2,199,023,255,552 milliseconds
+     *      ≈ 69.7 years
+     *
+     * 2. Shard ID (10 bits):
+     *    - Identifies the specific database shard or application instance generating
+     *      the ID.  This is crucial for distributing ID generation across multiple
+     *      servers.  10 bits allow for 2^10 = 1024 unique shard IDs.
+     *    - Example: A shard ID of 5 would be represented in binary as `0000000101`.
+     *
+     * 3. Sequence Number (12 bits):
+     *    - A counter that increments for each ID generated within the *same millisecond*
+     *      on the *same shard*. 12 bits allow for 2^12 = 4096 unique sequence numbers
+     *      per millisecond per shard.  This handles high-volume scenarios where many
+     *      IDs might be generated very close together in time.
+     *    - Example: If this is the 123rd ID generated in the current millisecond on this
+     *      shard, the sequence number would be 123 (binary `000001111011`).
+     *    - Atomic Increment: The `sequence.getAndIncrement()` method ensures that the
+     *      sequence number is incremented atomically, preventing race conditions in a
+     *      multi-threaded environment.
+     *    - Bitwise AND (`& 0xFFF`): This operation ensures the sequence number stays within
+     *      the 12-bit range (0-4095).  `0xFFF` is a hexadecimal representation of 4095.
+     *      The bitwise AND effectively masks all but the last 12 bits.
+     *
+     * Bitwise Operations:
+     *
+     * - Left Shift (`<<`):
+     *   - `timestamp << 22`: Shifts the 41-bit timestamp 22 positions to the left. This
+     *     creates 22 empty bits (filled with zeros) on the right-hand side of the
+     *     timestamp. These 22 bits are reserved for the shard ID (10 bits) and the
+     *     sequence number (12 bits).  The left shift is effectively multiplying by 2^22.
+     *
+     *     Example:
+     *       Timestamp (binary, simplified): `1001...00100`
+     *       Timestamp << 22:               `1001...00100000000000000000000000000`
+     *
+     *   - `shardId << 12`: Shifts the 10-bit shard ID 12 positions to the left, creating
+     *     12 empty bits on the right for the sequence number.  This is multiplying by 2^12
+     *
+     *     Example:
+     *       Shard ID (binary): `0000000101`
+     *       Shard ID << 12:    `0000000101000000000000`
+     *
+     * - Bitwise OR (`|`):
+     *   - Combines the shifted timestamp, shifted shard ID, and sequence number. Because
+     *     the left shifts created non-overlapping sections of bits, the bitwise OR
+     *     effectively concatenates the three values into a single 64-bit integer.
+     *
+     *     Example:
+     *     ```
+     *    +---------------------------------------------------------------------------------------------+
+     *    |       (timestamp << 22)                    |       (shardId << 12)        | sequenceNumber  |
+     *    +--------------------------------------------+------------------------------+-----------------+
+     *    |    1001...00100000000000000000000000000    |    0000000101000000000000    | 000001111011    |
+     *    +---------------------------------------------------------------------------------------------+
+     * 
+     *     Resulting 64-bit ID: 1001...001000000000101000001111011
+     *     ```
+     *
+     * Visual Representation:
+     *
+     *   +--------------------------------------------------------------------------------------------+
+     *   |                                              ID (64 bits)                                  |
+     *   +--------------------------------------------------------------------------------------------+
+     *   |   Timestamp (41 bits)         |        Shard ID (10 bits)          |       Seq (12 bits)   |
+     *   +-------------------------------+------------------------------------+-----------------------+
+     *   | 10010011...00100 0000000000   |           0000000101               |         000001111011  |
+     *   +-------------------------------+------------------------------------+-----------------------+
+     *
+     * @param shardId The ID of the database shard (0-1023).
+     * @return The generated 64-bit unique internal ID.
      */
-    private long generateInternalId(int shardId) {
+    private synchronized long generateInternalId(int shardId) {
+        // Calculate the elapsed milliseconds since the epoch.
         long timestamp = System.currentTimeMillis() - epoch;
-        int sequenceNumber = sequence.getAndIncrement() & 0xFFF; // Sequence within the millisecond
+
+        // Atomically increment the sequence counter and get the next value.
+        // The bitwise AND operation (& 0xFFF) ensures the sequence number
+        // stays within the 12-bit range (0-4095).
+        int sequenceNumber = sequence.getAndIncrement() & 0xFFF;
+
+        // Combine the timestamp, shard ID, and sequence number using bitwise shifts
+        // and the bitwise OR operator.
         return (timestamp << 22) | (shardId << 12) | sequenceNumber;
     }
+    
+    /*
+    Further Considerations:
+
+    1.  **Sequence Overflow:** This code *doesn't* handle sequence overflow within a
+        millisecond. In extremely high-volume scenarios (more than 4096 requests per
+        millisecond *per shard*), you'd need additional logic (wait, throw an error,
+        etc., as described in previous responses).
+
+    2.  **Clock Drift/Jump:**  This code *doesn't* handle system clock changes.  In a
+        production system, you *must* address clock drift/jumps (see previous responses
+        for detailed solutions, including `lastTimestamp` tracking and `tilNextMillis()`).
+
+    3. **Shard ID assignment:** This method take shard id as a parameter, but in prod env we have to designe a reliable
+    		sharding logic so that evry url will go to the same shard
+    */
+
+
 
     /**
      * Calculates the SHA-256 hash of a given string.

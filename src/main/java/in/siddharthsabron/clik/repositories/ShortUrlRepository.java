@@ -30,6 +30,6 @@ public interface ShortUrlRepository extends JpaRepository<ShortUrl, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE short_urls SET click_count = click_count + 1 WHERE shard_id = :shardId AND internal_id = :internalId", nativeQuery = true)
-    void incrementClickCount(Integer shardId, Long internalId);
+    @Query(value = "UPDATE short_urls SET click_count = COALESCE(click_count, 0) + 1 WHERE shard_id = :shardId AND internal_id = :internalId", nativeQuery = true)
+    int incrementClickCount(Integer shardId, Long internalId);
 }

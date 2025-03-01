@@ -36,7 +36,7 @@ public class ShortUrl extends AuditMetadata {
     private User user;
 
     @Column(name = "click_count", columnDefinition = "BIGINT UNSIGNED DEFAULT 0")
-    private Long clickCount;
+    private Long clickCount = 0L;
 
     @Column(name = "shard_id", nullable = false)
     private Integer shardId;
@@ -50,6 +50,7 @@ public class ShortUrl extends AuditMetadata {
         this.longUrl = longUrl;
         this.longUrlHash = longUrlHash;
         this.shardId = shardId;
+        this.clickCount = 0L;
     }
 
     // Getters and Setters
