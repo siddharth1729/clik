@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --glow-yellow: #FFE566;
+            --glow-yellow-dim: rgba(255, 229, 102, 0.15);
+            --dark-bg: #0D0D0D;
+            --darker-bg: #070707;
+            --text-color: #fff;
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--darker-bg);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--text-color);
+            text-shadow: 0 0 10px rgba(255, 229, 102, 0.3);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            color: var(--glow-yellow);
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--glow-yellow-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-icon:hover {
+            border-color: var(--glow-yellow);
+            box-shadow: 0 0 15px rgba(255, 229, 102, 0.2);
+        }
+
+        .profile-icon i {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .profile-icon:hover i {
+            color: var(--glow-yellow);
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+            margin-top: -100px;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            border: 1px solid var(--glow-yellow-dim);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: var(--glow-yellow);
+            box-shadow: 0 0 20px rgba(255, 229, 102, 0.1);
+        }
+
+        .clik-button {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            border: 1px solid var(--glow-yellow);
+            background-color: var(--glow-yellow);
+            color: var(--darker-bg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(255, 229, 102, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clik-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 30px rgba(255, 229, 102, 0.4);
+        }
+
+        .clik-button.outline {
+            background-color: transparent;
+            color: var(--glow-yellow);
+            border: 1px solid var(--glow-yellow);
+            box-shadow: 0 0 15px rgba(255, 229, 102, 0.15);
+        }
+
+        .clik-button.outline:hover {
+            background-color: var(--glow-yellow);
+            color: var(--darker-bg);
+            box-shadow: 0 0 25px rgba(255, 229, 102, 0.3);
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: var(--input-bg);
+            border-radius: 15px;
+            border: 1px solid var(--glow-yellow-dim);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .result:hover {
+            border-color: var(--glow-yellow);
+            box-shadow: 0 0 20px rgba(255, 229, 102, 0.1);
+        }
+
+        .result a {
+            color: var(--glow-yellow);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .result a:hover {
+            opacity: 0.8;
+        }
+
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--darker-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid var(--glow-yellow-dim);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .auth-modal h2 {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--glow-yellow-dim);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--glow-yellow);
+            box-shadow: 0 0 20px rgba(255, 229, 102, 0.1);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--glow-yellow);
+        }
+
+        .auth-modal a {
+            color: var(--glow-yellow);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .auth-modal a:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">Clik</a>
+        <div class="auth-buttons">
+            <div class="profile-icon" onclick="toggleAuthModal('login')">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="search-container">
+            <input type="url" id="longUrl" class="url-input" placeholder="Enter your long URL here...">
+            <button onclick="shortenUrl()" class="clik-button">Clik</button>
+        </div>
+        <div id="shortUrlResult" class="result"></div>
+    </main>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="auth-modal" id="authModal">
+        <span class="close-modal" onclick="closeAuthModal()">&times;</span>
+        <div id="loginForm">
+            <h2>Login</h2>
+            <div class="form-group">
+                <input type="email" id="loginEmail" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <input type="password" id="loginPassword" placeholder="Password">
+            </div>
+            <button class="clik-button outline" onclick="login()">Login</button>
+            <p style="text-align: center; margin-top: 1rem;">
+                Don't have an account? 
+                <a href="#" onclick="switchForm('register')">Register</a>
+            </p>
+        </div>
+        <div id="registerForm" style="display: none;">
+            <h2>Register</h2>
+            <div class="form-group">
+                <input type="text" id="firstName" placeholder="First Name">
+            </div>
+            <div class="form-group">
+                <input type="text" id="lastName" placeholder="Last Name">
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Password">
+            </div>
+            <button class="clik-button outline" onclick="registerUser()">Register</button>
+            <p style="text-align: center; margin-top: 1rem;">
+                Already have an account? 
+                <a href="#" onclick="switchForm('login')">Login</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function toggleAuthModal(type) {
+            const modal = document.getElementById('authModal');
+            const overlay = document.getElementById('modalOverlay');
+            modal.style.display = 'block';
+            overlay.style.display = 'block';
+            switchForm(type);
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            const overlay = document.getElementById('modalOverlay');
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        }
+
+        function switchForm(type) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            if (type === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            }
+        }
+
+        async function shortenUrl() {
+            const longUrl = document.getElementById('longUrl').value;
+            if (!longUrl) {
+                alert('Please enter a URL');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/shorten', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ longUrl }),
+                });
+
+                if (response.ok) {
+                    const shortUrl = await response.text();
+                    const resultDiv = document.getElementById('shortUrlResult');
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <p>Your shortened URL:</p>
+                        <a href="${shortUrl}" target="_blank">${shortUrl}</a>
+                    `;
+                } else {
+                    throw new Error('Failed to shorten URL');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function registerUser() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!firstName || !lastName || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        firstName,
+                        lastName,
+                        email,
+                        password
+                    }),
+                });
+
+                if (response.ok) {
+                    alert('Registration successful!');
+                    switchForm('login');
+                } else {
+                    throw new Error('Registration failed');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // TODO: Implement login API call
+            alert('Login functionality coming soon!');
+        }
+    </script>
+</body>
+</html> 

@@ -24,8 +24,10 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
+ * NOTE:
  * ShortenerService: Provides the core business logic for shortening and resolving URLs.
  *
+ * NOTE:
  * Key Features:
  * - Handles URL shortening, including duplicate detection and concurrency control.
  * - Resolves short URLs to their original long URLs.
@@ -160,12 +162,11 @@ public class ShortenerService {
 
 
     /**
+     * NOTE:
      * Generates a unique internal ID using a Snowflake-like approach. This method is designed
      * to create unique IDs across a distributed system without relying on a central
      * coordinating service (like an auto-incrementing database column).
-     *
      * The generated ID is a 64-bit long integer, structured as follows:
-     *
      *   +-------------------------------------------------------------------------------------------------------------------+
      *   | Timestamp (41 bits)                   |       ShardID(10)      |      Sequence(12)   |                            |
      *   +---------------------------------------+------------------------+---------------------+----------------------------+
@@ -183,7 +184,6 @@ public class ShortenerService {
      *      collisions (new epoch, re-sharding, etc.).
      *      2^41 milliseconds = 2,199,023,255,552 milliseconds
      *      ≈ 69.7 years
-     *
      * 2. Shard ID (10 bits):
      *    - Identifies the specific database shard or application instance generating
      *      the ID.  This is crucial for distributing ID generation across multiple
