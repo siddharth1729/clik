@@ -50,4 +50,10 @@ public class User extends AuditMetadata{
             return passwordHelper.setPassword(password);
         }
     
+    public Long getUserId() {
+        return userId;
+    }
+    public String getPassword() {
+        return password;
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import in.siddharthsabron.clik.models.links.ShortUrl; // Correct import
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -32,4 +33,6 @@ public interface ShortUrlRepository extends JpaRepository<ShortUrl, Long> {
     @Transactional
     @Query(value = "UPDATE short_urls SET click_count = COALESCE(click_count, 0) + 1 WHERE shard_id = :shardId AND internal_id = :internalId", nativeQuery = true)
     int incrementClickCount(Integer shardId, Long internalId);
+
+    List<ShortUrl> findAllByUser_UserId(Long userId);
 }
