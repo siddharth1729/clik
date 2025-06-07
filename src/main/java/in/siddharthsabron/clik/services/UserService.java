@@ -23,7 +23,6 @@ public class UserService {
         logger.info("User created: {}", savedUser);
         return savedUser;
     }
-
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }

@@ -309,6 +309,35 @@
                 padding: 1.2rem 0.5rem;
             }
         }
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .links-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .links-table th, .links-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--outline);
+        }
+        .links-table th {
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+            font-weight: 600;
+        }
+        .links-table tr:hover {
+            background: var(--surface-variant);
+        }
+        .links-table a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .links-table a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -332,6 +361,26 @@
                 <button class="button" onclick="shortenUrl()">Shorten</button>
             </div>
             <div id="shortUrlResult" class="result" style="display:none;"></div>
+        </section>
+
+        <!-- User Links Table -->
+        <section class="card" id="userLinksCard" style="display:none;">
+            <div class="card-title">Your Shortened Links</div>
+            <div class="table-container">
+                <table class="links-table">
+                    <thead>
+                        <tr>
+                            <th>Short Code</th>
+                            <th>Original URL</th>
+                            <th>Created At</th>
+                            <th>Clicks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userLinksTableBody">
+                        <!-- Links will be populated here -->
+                    </tbody>
+                </table>
+            </div>
         </section>
     </main>
 
@@ -528,8 +577,8 @@
                 if (response.ok) {
                     user = await response.json();
                     closeAuthModal();
-                    updateUIForLogin();
-                    showPage('main');
+                    document.getElementById('userLinksCard').style.display = 'block';
+                    fetchUserLinks();
                 } else {
                     alert('Invalid credentials.');
                 }
@@ -542,38 +591,40 @@
         function logout() {
             fetch('/api/users/logout', { method: 'POST' }).finally(() => {
                 user = null;
-                updateUIForLogout();
-                showPage('main');
+                document.getElementById('userLinksCard').style.display = 'none';
+                document.getElementById('userLinksTableBody').innerHTML = '';
             });
         }
 
         // --- Dashboard Logic ---
         async function fetchUserLinks() {
+            if (!user) return;
+            
             try {
-                const response = await fetch('/api/users/links');
+                const response = await fetch(`/api/users/links/${user.email}`);
                 if (response.ok) {
                     const links = await response.json();
-                    renderLinksTable(links);
+                    renderUserLinks(links);
                 } else {
-                    renderLinksTable([]);
+                    const error = await response.json();
+                    console.error('Error fetching links:', error.message);
                 }
-            } catch (e) {
-                renderLinksTable([]);
+            } catch (error) {
+                console.error('Error:', error);
             }
         }
-        function renderLinksTable(links) {
-            const tbody = document.getElementById('linksTableBody');
+        function renderUserLinks(links) {
+            const tbody = document.getElementById('userLinksTableBody');
             tbody.innerHTML = '';
-            const template = document.getElementById('linkRowTemplate');
+            
             links.forEach(link => {
-                const row = template.content.cloneNode(true);
-                const shortA = row.querySelector('.short-link');
-                const longA = row.querySelector('.long-link');
-                shortA.href = link.shortCode.startsWith('http') ? link.shortCode : (`/s/${link.shortCode}`);
-                shortA.textContent = window.location.origin + '/s/' + link.shortCode;
-                longA.href = link.longUrl;
-                longA.textContent = link.longUrl;
-                row.querySelector('.click-count').textContent = link.clickCount || 0;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="/s/${link.shortCode}" target="_blank">${link.shortCode}</a></td>
+                    <td><a href="${link.longUrl}" target="_blank">${link.longUrl}</a></td>
+                    <td>${new Date(link.createdAt).toLocaleString()}</td>
+                    <td>${link.clickCount}</td>
+                `;
                 tbody.appendChild(row);
             });
         }
@@ -600,17 +651,15 @@
                 const response = await fetch('/api/users/links');
                 if (response.ok) {
                     user = true;
-                    updateUIForLogin();
-                    showPage('main');
+                    document.getElementById('userLinksCard').style.display = 'block';
+                    fetchUserLinks();
                 } else {
                     user = null;
-                    updateUIForLogout();
-                    showPage('main');
+                    document.getElementById('userLinksCard').style.display = 'none';
                 }
             } catch {
                 user = null;
-                updateUIForLogout();
-                showPage('main');
+                document.getElementById('userLinksCard').style.display = 'none';
             }
         }
         checkSession();

@@ -1,7 +1,10 @@
 package in.siddharthsabron.clik.controllers;
 
 import in.siddharthsabron.clik.dto.UserRegistrationRequest;
+import in.siddharthsabron.clik.dto.ShortUrlResponseDto;
+import in.siddharthsabron.clik.dto.ErrorResponseDto;
 import in.siddharthsabron.clik.models.authentications.User;
+import in.siddharthsabron.clik.models.links.ShortUrl;
 import in.siddharthsabron.clik.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +16,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.List;
 import java.util.Optional;
-import in.siddharthsabron.clik.repositories.ShortUrlRepository;
+import java.util.stream.Collectors;
+import in.siddharthsabron.clik.repositories.UserRepository;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,7 +29,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private ShortUrlRepository shortUrlRepository;
+    private UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody UserRegistrationRequest request) {
@@ -49,13 +53,41 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
 
-    @GetMapping("/links")
-    public ResponseEntity<?> getUserLinks(HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+    @GetMapping("/links/{email}")
+    public ResponseEntity<?> getAllShortUrlsByUserEmail(@PathVariable String email) {
+        try {
+            logger.info("Fetching short URLs for email: {}", email);
+            List<ShortUrl> shortUrls = userRepository.findAllShortUrlsByUserEmail(email);
+            logger.info("Number of short URLs found: {}", shortUrls.size());
+            logger.info("Short URLs details: {}", shortUrls.stream()
+                .map(url -> String.format("ID: %d, Code: %s, URL: %s", 
+                    url.getInternalId(), 
+                    url.getShortCode(), 
+                    url.getLongUrl()))
+                .collect(Collectors.joining(", ")));
+            
+            if (shortUrls.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponseDto("No short URLs found for user with email: " + email, HttpStatus.NOT_FOUND.value()));
+            }
+            
+            List<ShortUrlResponseDto> responseDtos = shortUrls.stream()
+                .map(url -> new ShortUrlResponseDto(
+                    url.getInternalId(),
+                    url.getShortCode(),
+                    url.getLongUrl(),
+                    url.getCreatedAt(),
+                    url.getClickCount(),
+                    url.getUser().getEmail()
+                ))
+                .collect(Collectors.toList());
+            
+            logger.info("Converted to DTOs: {}", responseDtos.size());
+            return ResponseEntity.ok(responseDtos);
+        } catch (Exception e) {
+            logger.error("Error fetching short URLs for email: " + email, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponseDto("Error fetching short URLs: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
-        List<in.siddharthsabron.clik.models.links.ShortUrl> links = shortUrlRepository.findAllByUser_UserId(userId);
-        return ResponseEntity.ok(links);
     }
 } 

@@ -41,7 +41,7 @@ public class ShortenerController {
             logger.info("=====Shortened URL created: {} for userId: {}", shortCode, userId);
         } else {
             // Anonymous user
-            userId = (long) 0;
+            
             shortCode = shortenerService.shortenUrl(request.getLongUrl(), userId);
             logger.info("Shortened URL created: {} for userId: {}", shortCode, userId);
         }
