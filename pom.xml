@@ -5,9 +5,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.2</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
+        <version>3.2.3</version>
+        <relativePath/> </parent>
     <groupId>in.siddharthsabron</groupId>
     <artifactId>clik</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -33,6 +32,7 @@
     </scm>
     <properties>
         <java.version>21</java.version>
+        <lombok.version>1.18.32</lombok.version>
     </properties>
     <dependencies>
         <dependency>
@@ -71,6 +71,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -94,11 +95,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <annotationProcessorPaths>
+                <version>3.13.0</version> <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <release>${java.version}</release> <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

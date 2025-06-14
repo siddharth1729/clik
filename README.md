@@ -1,3 +1,5 @@
+[Clik UrlShortner](/preview.png)
+
 # Clik - A Self-Deployable URL Shortener
 
 Clik is a robust, scalable URL shortening service built with Spring Boot and Java. It provides a simple yet powerful way to create shortened URLs with optional user management and click tracking capabilities.
