@@ -1,4 +1,4 @@
-[Clik UrlShortner](/preview.png)
+![Clik UrlShortner](/preview.png)
 
 # Clik - A Self-Deployable URL Shortener
 
