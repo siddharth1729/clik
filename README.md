@@ -2,7 +2,116 @@
 
 # Clik - A Self-Deployable URL Shortener
 
-Clik is a robust, scalable URL shortening service built with Spring Boot and Java. It provides a simple yet powerful way to create shortened URLs with optional user management and click tracking capabilities.
+Clik is a modern, self-deployable URL shortener built with Spring Boot. It provides a secure and efficient way to create short URLs from long ones.
+
+## Features
+
+- URL shortening with custom short codes
+- Click tracking and analytics
+- User authentication and authorization
+- Secure URL management
+- MySQL database integration
+- Thymeleaf templating for web interface
+
+## Prerequisites
+
+- Java 21 (or Java 17 for better compatibility)
+- Maven 3.9+
+- MySQL 8.0+
+- SDKMAN! (recommended for Java version management)
+
+## Getting Started
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/yourusername/clik.git
+cd clik
+```
+
+### 2. Set Up Java Environment
+Using SDKMAN!:
+```bash
+# Install Java 21
+sdk install java 21.0.3-tem
+
+# Use Java 21
+sdk use java 21.0.3-tem
+```
+
+### 3. Configure Database
+Create a MySQL database and update the `application.properties` file with your database credentials:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/clik
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+```
+
+### 4. Build the Project
+```bash
+mvn clean install
+```
+
+### 5. Run the Application
+```bash
+mvn spring-boot:run
+```
+
+The application will be available at `http://localhost:8080`
+
+## Project Structure
+
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── in/siddharthsabron/clik/
+│   │       ├── config/        # Configuration classes
+│   │       ├── controller/    # REST controllers
+│   │       ├── dto/          # Data Transfer Objects
+│   │       ├── entity/       # JPA entities
+│   │       ├── repository/   # JPA repositories
+│   │       ├── service/      # Business logic
+│   │       └── ClikApplication.java
+│   └── resources/
+│       ├── static/          # Static resources
+│       ├── templates/       # Thymeleaf templates
+│       └── application.properties
+└── test/                    # Test classes
+```
+
+## Dependencies
+
+- Spring Boot 3.2.3
+- Spring Security
+- Spring Data JPA
+- Hibernate 6.2.5
+- MySQL Connector
+- Lombok 1.18.32
+- Thymeleaf
+- Spring Boot DevTools
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Author
+
+- **Siddharth Sabron**
+  - Email: siddharth.sabron@gmail.com
+  - Website: https://siddharthsabron.in
+
+## Acknowledgments
+
+- Spring Boot team for the amazing framework
+- The open-source community for various libraries and tools used in this project
 
 ## 🚀 Features
 
@@ -146,12 +255,6 @@ The application uses two main tables:
    ```bash
    java -jar target/clik-0.0.1-SNAPSHOT.jar
    ```
-
-## 👥 Authors
-
-- Siddharth Sabron - [Website](https://siddharthsabron.in)
-
-
 
 ## 📞 Support
 
