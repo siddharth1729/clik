@@ -1,6 +1,6 @@
 package in.siddharthsabron.clik.models.baseModels;
 
-
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -16,6 +16,7 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class AuditMetadata implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @CreatedDate

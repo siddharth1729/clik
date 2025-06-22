@@ -60,10 +60,10 @@ public class UserController {
             List<ShortUrl> shortUrls = userRepository.findAllShortUrlsByUserEmail(email);
             logger.info("Number of short URLs found: {}", shortUrls.size());
             logger.info("Short URLs details: {}", shortUrls.stream()
-                .map(url -> String.format("ID: %d, Code: %s, URL: %s", 
-                    url.getInternalId(), 
-                    url.getShortCode(), 
-                    url.getLongUrl()))
+                .map(url -> "ID: %d, Code: %s, URL: %s".formatted(
+                        url.getInternalId(),
+                        url.getShortCode(),
+                        url.getLongUrl()))
                 .collect(Collectors.joining(", ")));
             
             if (shortUrls.isEmpty()) {
