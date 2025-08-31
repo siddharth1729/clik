@@ -34,16 +34,16 @@ public class ShortenerController {
         logger.info("Received shorten URL request");
         Long userId = (Long) session.getAttribute("userId");
         String shortCode;
-
+        logger.info("=======UserId from session: {}=====", userId);
+        
         if (userId != null) {
-            // User is logged in
+            // User is logged in - use session userId
             shortCode = shortenerService.shortenUrl(request.getLongUrl(), userId);
-            logger.info("=====Shortened URL created: {} for userId: {}", shortCode, userId);
+            logger.info("=====Shortened URL created: {} for authenticated userId: {}", shortCode, userId);
         } else {
-            // Anonymous user
-            
-            shortCode = shortenerService.shortenUrl(request.getLongUrl(), userId);
-            logger.info("Shortened URL created: {} for userId: {}", shortCode, userId);
+            // Anonymous user - pass null
+            shortCode = shortenerService.shortenUrl(request.getLongUrl());
+            logger.info("=====Shortened URL created: {} for anonymous user", shortCode);
         }
 
         String shortUrl = "http://localhost:8080/s/" + shortCode;

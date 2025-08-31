@@ -8,7 +8,7 @@ public class ShortUrlResponseDto {
     private String longUrl;
     private Instant createdAt;
     private Long clickCount;
-    private String userEmail;
+    private String userEmail; // Can be null for anonymous links
 
     // Constructor
     public ShortUrlResponseDto(Long internalId, String shortCode, String longUrl, Instant createdAt, Long clickCount, String userEmail) {

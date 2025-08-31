@@ -66,16 +66,18 @@ public class ShortenerService {
    */
   @Transactional
   public String shortenUrl(String longUrl, Long userId) {
-    User user = userRepository.findById(userId)
-    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-    if (userId != null) {
-      user = userRepository.findById(userId)
-          .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    Optional<User> user = userRepository.findByUserId(userId);
+    if (user.isEmpty()) {
+      throw new IllegalArgumentException("User not found with ID: " + userId);
     }
-    return shortenUrlInternal(longUrl, user);
+    else{
+      logger.info("Shortening URL for user: {}", user.get().getUserId());
+    }
+  
+    return shortenUrlInternal(longUrl, user.orElse(null));
   }
 
-  /**
+  /**s
    * Shortens a URL anonymously (without user association).
    *
    * @param longUrl The URL to shorten.

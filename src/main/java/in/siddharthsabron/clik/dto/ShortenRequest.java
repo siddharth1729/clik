@@ -6,10 +6,13 @@ package in.siddharthsabron.clik.dto;
 public class ShortenRequest {
     private String longUrl;
 
+    private Long userId;
+
     public ShortenRequest() {}
 
-    public ShortenRequest(String longUrl) {
+    public ShortenRequest(String longUrl , Long userId) {
         this.longUrl = longUrl;
+        this.userId = userId;
     }
 
     public String getLongUrl() {
@@ -19,4 +22,12 @@ public class ShortenRequest {
     public void setLongUrl(String longUrl) {
         this.longUrl = longUrl;
     }
+
+    public Long getUserId() {
+        return userId;
+    }
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
 }

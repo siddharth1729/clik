@@ -8,7 +8,6 @@ import in.siddharthsabron.clik.models.links.ShortUrl;
 import in.siddharthsabron.clik.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +24,21 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @Autowired
+    /*
+     *
+     * NOTE: Am using constructor injection because this looks hot and sexy as fuckkkk.
+     * 
+     */
     private UserService userService;
-
-    @Autowired
     private UserRepository userRepository;
 
+    public UserController(UserService userService, UserRepository userRepository) {
+        this.userService = userService;
+        this.userRepository = userRepository;
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody UserRegistrationRequest request) {
+    public ResponseEntity<User> registerUser(@RequestBody UserRegistrationRequest request) throws Exception {
         logger.info("Registering user: {}", request.getEmail());
         User newUser = userService.createUser(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPassword());
         logger.info("User registered successfully: {}", newUser);
@@ -54,7 +60,7 @@ public class UserController {
     }
 
     @GetMapping("/links/{email}")
-    public ResponseEntity<?> getAllShortUrlsByUserEmail(@PathVariable String email) {
+    public ResponseEntity<?> getAllShortUrlsByUserEmail(@PathVariable String email) throws Exception {
         try {
             logger.info("Fetching short URLs for email: {}", email);
             List<ShortUrl> shortUrls = userRepository.findAllShortUrlsByUserEmail(email);
@@ -68,7 +74,8 @@ public class UserController {
             
             if (shortUrls.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponseDto("No short URLs found for user with email: " + email, HttpStatus.NOT_FOUND.value()));
+                    .body(new ErrorResponseDto("No short URLs found for user with email: " 
+                    + email, HttpStatus.NOT_FOUND.value()));
             }
             
             List<ShortUrlResponseDto> responseDtos = shortUrls.stream()
@@ -78,7 +85,7 @@ public class UserController {
                     url.getLongUrl(),
                     url.getCreatedAt(),
                     url.getClickCount(),
-                    url.getUser().getEmail()
+                    url.getUser() != null ? url.getUser().getEmail() : null
                 ))
                 .collect(Collectors.toList());
             
