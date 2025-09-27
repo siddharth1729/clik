@@ -46,7 +46,7 @@ public class ShortenerController {
             logger.info("=====Shortened URL created: {} for anonymous user", shortCode);
         }
 
-        String shortUrl = "http://localhost:8080/s/" + shortCode;
+        String shortUrl = "http://localhost:8080/a/" + shortCode;
         return new ResponseEntity<>(shortUrl, HttpStatus.OK);
     }
 
