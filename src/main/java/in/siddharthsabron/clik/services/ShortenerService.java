@@ -77,7 +77,7 @@ public class ShortenerService {
     return shortenUrlInternal(longUrl, user.orElse(null));
   }
 
-  /**s
+     /**s
    * Shortens a URL anonymously (without user association).
    *
    * @param longUrl The URL to shorten.

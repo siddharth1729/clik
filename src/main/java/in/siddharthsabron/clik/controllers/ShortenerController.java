@@ -5,7 +5,6 @@ import in.siddharthsabron.clik.services.ShortenerService;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +18,12 @@ public class ShortenerController {
 
     private static final Logger logger = LoggerFactory.getLogger(ShortenerController.class);
 
-    @Autowired
+ 
     private ShortenerService shortenerService;
+
+    public ShortenerController(ShortenerService shortenerService) {
+        this.shortenerService = shortenerService;
+    }
 
     /**
      * Shortens a long URL.  Can be used with or without a logged-in user.

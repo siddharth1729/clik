@@ -4,7 +4,6 @@ package in.siddharthsabron.clik.controllers;
 import in.siddharthsabron.clik.services.ShortenerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -16,8 +15,11 @@ public class RedirectController {
 
     private static final Logger logger = LoggerFactory.getLogger(RedirectController.class);
 
-    @Autowired
     private ShortenerService shortenerService;
+
+    public RedirectController(ShortenerService shortenerService) {
+        this.shortenerService = shortenerService;
+    }
 
     /**
      * Redirects a short code to its corresponding long URL.
