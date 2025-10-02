@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     @SuppressWarnings("null")
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**")
+        registry.addResourceHandler("/a**")
                 .addResourceLocations("classpath:/templates/", "classpath:/static/");
     }
 
@@ -20,4 +20,4 @@ public class WebConfig implements WebMvcConfigurer {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("index.html");
     }
-} 
+}
