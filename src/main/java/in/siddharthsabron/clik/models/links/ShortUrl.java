@@ -53,21 +53,23 @@ public class ShortUrl extends AuditMetadata {
         this.clickCount = 0L;
     }
 
-    // Getters and Setters
+    // Getters 
     public Long getInternalId() { return internalId; }
-    public void setInternalId(Long internalId) { this.internalId = internalId; }
     public String getShortCode() { return shortCode; }
-    public void setShortCode(String shortCode) { this.shortCode = shortCode; }
     public String getLongUrl() { return longUrl; }
-    public void setLongUrl(String longUrl) { this.longUrl = longUrl; }
     public byte[] getLongUrlHash() { return longUrlHash; }
-    public void setLongUrlHash(byte[] longUrlHash) { this.longUrlHash = longUrlHash; }
     public Timestamp getExpiresAt() { return expiresAt; }
-    public void setExpiresAt(Timestamp expiresAt) { this.expiresAt = expiresAt; }
     public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
     public Long getClickCount() { return clickCount; }
-    public void setClickCount(Long clickCount) { this.clickCount = clickCount; }
     public Integer getShardId() { return shardId; }
+    
+    // Setters
+    public void setInternalId(Long internalId) { this.internalId = internalId; }
+    public void setShortCode(String shortCode) { this.shortCode = shortCode; }
+    public void setLongUrl(String longUrl) { this.longUrl = longUrl; }
+    public void setLongUrlHash(byte[] longUrlHash) { this.longUrlHash = longUrlHash; }
+    public void setExpiresAt(Timestamp expiresAt) { this.expiresAt = expiresAt; }
+    public void setUser(User user) { this.user = user; }
+    public void setClickCount(Long clickCount) { this.clickCount = clickCount; }
     public void setShardId(Integer shardId) { this.shardId = shardId; }
 }
