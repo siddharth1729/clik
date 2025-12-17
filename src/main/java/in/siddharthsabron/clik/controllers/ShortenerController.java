@@ -28,26 +28,18 @@ public class ShortenerController {
     /**
      * Shortens a long URL.  Can be used with or without a logged-in user.
      *
-     * @param request The request body containing the long URL.
-     * @param session The HTTP session (used to get the userId, if present).
+     * @param request The request body containing the long URL
      * @return A ResponseEntity containing the short URL.
      */
     @PostMapping("/shorten")
-    public ResponseEntity<String> shortenUrl(@RequestBody ShortenRequest request, HttpSession session) {
+    public ResponseEntity<String> shortenUrl(@RequestBody ShortenRequest shortenRequest) {
         logger.info("Received shorten URL request");
-        Long userId = (Long) session.getAttribute("userId");
+        Long userId = shortenRequest.getUserId();
         String shortCode;
         logger.info("=======UserId from session: {}=====", userId);
-        
-        if (userId != null) {
-            // User is logged in - use session userId
-            shortCode = shortenerService.shortenUrl(request.getLongUrl(), userId);
-            logger.info("=====Shortened URL created: {} for authenticated userId: {}", shortCode, userId);
-        } else {
-            // Anonymous user - pass null
-            shortCode = shortenerService.shortenUrl(request.getLongUrl());
-            logger.info("=====Shortened URL created: {} for anonymous user", shortCode);
-        }
+
+        shortCode = shortenerService.shortenUrl(shortenRequest.getLongUrl(), userId);
+        logger.info("=====Shortened URL created: {} for authenticated userId: {}", shortCode, userId);
 
         String shortUrl = "http://localhost:8080/a/" + shortCode;
         return new ResponseEntity<>(shortUrl, HttpStatus.OK);

@@ -9,5 +9,4 @@ import lombok.Data;
 public class ShortenRequest {
     private String longUrl;
     private Long userId;
-
 }

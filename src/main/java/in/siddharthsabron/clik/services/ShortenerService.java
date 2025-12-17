@@ -68,7 +68,7 @@ public class ShortenerService {
   public String shortenUrl(String longUrl, Long userId) {
     Optional<User> user = userRepository.findByUserId(userId);
     if (user.isEmpty()) {
-      throw new IllegalArgumentException("User not found with ID: " + userId);
+      logger.info("User not found with ID: {}", userId);
     }
     else{
       logger.info("Shortening URL for user: {}", user.get().getUserId());
@@ -111,6 +111,7 @@ public class ShortenerService {
 
     ShortUrl newLink = new ShortUrl(internalId, shortCode, longUrl, longUrlHash, shardId);
     newLink.setUser(user); // Set the user (can be null)
+    //ShortUrlRepository shortUrlRepositoryData = shortUrlRepository.save(newLink);
     shortUrlRepository.save(newLink);
     return shortCode;
   }
