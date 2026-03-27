@@ -3,666 +3,1392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clik - Modern URL Shortener</title>
-    <!-- Google Fonts & Material Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <title>Clik — URL Shortener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <style>
+        /* ── Reset ────────────────────────────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── Design tokens ────────────────────────────────────────────────────── */
         :root {
-            --primary: #7b61ff;
-            --on-primary: #fff;
-            --primary-container: #e9e3ff;
-            --on-primary-container: #2d1a6b;
-            --secondary: #5e5a80;
-            --on-secondary: #fff;
-            --background: #f6f7fb;
-            --surface: rgba(255,255,255,0.55);
-            --surface-glass: rgba(255,255,255,0.25);
-            --surface-variant: rgba(233,227,255,0.7);
-            --on-surface: #1c1b1f;
-            --outline: #bdb8e0;
-            --error: #d32f2f;
-            --on-error: #fff;
-            --shadow: 0 4px 32px 0 rgba(123,97,255,0.10);
-            --glass-blur: blur(18px);
+            --bg:              #f4f3ff;
+            --surface:         rgba(255, 255, 255, 0.72);
+            --surface-solid:   #ffffff;
+            --border:          rgba(124, 58, 237, 0.13);
+            --border-strong:   rgba(124, 58, 237, 0.32);
+            --accent:          #7c3aed;
+            --accent-dark:     #6d28d9;
+            --accent-light:    #f5f3ff;
+            --accent-muted:    rgba(124, 58, 237, 0.07);
+            --text:            #0d0720;
+            --text-2:          #5b5478;
+            --text-3:          #9d97b8;
+            --success:         #059669;
+            --error:           #dc2626;
+            --error-bg:        #fff1f2;
+            --shadow-xs:       0 1px 3px rgba(0,0,0,0.06);
+            --shadow-sm:       0 2px 12px rgba(124,58,237,0.07), 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md:       0 8px 32px rgba(124,58,237,0.10), 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg:       0 24px 64px rgba(124,58,237,0.13), 0 4px 16px rgba(0,0,0,0.07);
+            --radius-xs:       6px;
+            --radius-sm:       10px;
+            --radius:          16px;
+            --radius-lg:       22px;
+            --blur:            blur(20px);
+            --ease:            cubic-bezier(0.4, 0, 0.2, 1);
+            --t:               160ms;
         }
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', 'Inter', sans-serif;
-            background: var(--background);
-            color: var(--on-surface);
-        }
+
+        /* ── Base ─────────────────────────────────────────────────────────────── */
+        html { height: 100%; scroll-behavior: smooth; }
+
         body {
-            min-height: 100vh;
+            min-height: 100%;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Mesh gradient — purely decorative */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 55% at 15%  10%, rgba(124,58,237,0.13) 0%, transparent 60%),
+                radial-gradient(ellipse 55% 45% at 85%  85%, rgba(99,102,241,0.09) 0%, transparent 60%),
+                radial-gradient(ellipse 45% 35% at 55%  50%, rgba(167,139,250,0.06) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Layout shell ─────────────────────────────────────────────────────── */
+        #app {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
         }
+
+        /* ── Shared glass helper ───────────────────────────────────────────────── */
+        .glass {
+            background: var(--surface);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border: 1px solid var(--border);
+        }
+
+        /* ── Material Symbols baseline ────────────────────────────────────────── */
+        .icon {
+            font-family: 'Material Symbols Rounded';
+            font-style: normal;
+            font-weight: normal;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            vertical-align: middle;
+            user-select: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           NAVBAR
+        ═══════════════════════════════════════════════════════════════════════ */
         .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 200;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1.2rem 2.5rem;
-            background: var(--surface-glass);
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            backdrop-filter: var(--glass-blur);
-            border-bottom: 1.5px solid var(--outline);
+            padding: 0 2rem;
+            height: 60px;
+            background: rgba(244, 243, 255, 0.82);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border-bottom: 1px solid var(--border);
         }
-        .logo {
-            font-family: 'Roboto', 'Orbitron', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: 2px;
-            text-decoration: none;
+
+        .nav-logo {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
-            font-size: 2rem;
-            color: var(--primary);
+            text-decoration: none;
             cursor: pointer;
-            border-radius: 50%;
-            padding: 0.3rem;
-            transition: background 0.2s;
+            user-select: none;
         }
-        .material-symbols-outlined:hover {
-            background: var(--primary-container);
-        }
-        .main-content {
-            flex: 1;
+        .nav-logo-mark {
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            border-radius: 8px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 2.5rem 1rem 1rem 1rem;
-            gap: 2.5rem;
-        }
-        .card, .glass-section {
-            background: var(--surface-glass);
-            border-radius: 1.5rem;
-            box-shadow: var(--shadow);
-            padding: 2.5rem 2rem 2rem 2rem;
-            max-width: 480px;
-            width: 100%;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            backdrop-filter: var(--glass-blur);
-            border: 1.5px solid var(--outline);
-        }
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-        .input-group {
-            display: flex;
-            gap: 1rem;
-        }
-        .input {
-            flex: 1;
-            padding: 1rem 1.2rem;
-            border-radius: 2rem;
-            border: 1.5px solid var(--outline);
-            background: var(--surface-variant);
-            color: var(--on-surface);
-            font-size: 1rem;
-            outline: none;
-            transition: border 0.2s;
-        }
-        .input:focus {
-            border: 2px solid var(--primary);
-        }
-        .button {
-            padding: 1rem 2.2rem;
-            border-radius: 2rem;
-            border: none;
-            background: var(--primary);
-            color: var(--on-primary);
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            transition: background 0.2s, box-shadow 0.2s;
-        }
-        .button:hover {
-            background: #5e47d6;
-            box-shadow: 0 4px 16px rgba(123,97,255,0.16);
-        }
-        .button.outline {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-        .button.outline:hover {
-            background: var(--primary-container);
-        }
-        .result {
-            background: var(--primary-container);
-            color: var(--on-primary-container);
-            border-radius: 1rem;
-            padding: 1.2rem;
-            text-align: center;
-            margin-top: 1rem;
-            font-size: 1.1rem;
-            word-break: break-all;
-            box-shadow: var(--shadow);
-        }
-        .dashboard-page {
-            width: 100vw;
-            min-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 2.5rem 0.5rem 1rem 0.5rem;
-        }
-        .dashboard {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            background: var(--surface-glass);
-            border-radius: 1.5rem;
-            box-shadow: var(--shadow);
-            padding: 2rem 2rem 1.5rem 2rem;
-            backdrop-filter: var(--glass-blur);
-            border: 1.5px solid var(--outline);
-        }
-        .dashboard-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 1.2rem;
-        }
-        .links-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .links-table th, .links-table td {
-            padding: 0.7rem 1rem;
-            text-align: left;
-        }
-        .links-table th {
-            color: var(--secondary);
-            font-weight: 500;
-            border-bottom: 2px solid var(--surface-variant);
-        }
-        .links-table tr {
-            border-bottom: 1px solid var(--surface-variant);
-        }
-        .links-table tr:last-child {
-            border-bottom: none;
-        }
-        .links-table td {
-            color: var(--on-surface);
-            font-size: 1rem;
-        }
-        .links-table a {
-            color: var(--primary);
-            text-decoration: underline;
-            word-break: break-all;
-        }
-        /* Full-page glassy modal for auth */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(123,97,255,0.18);
-            z-index: 1000;
-            backdrop-filter: var(--glass-blur);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            margin: auto;
-            background: var(--surface-glass);
-            border-radius: 2rem;
-            box-shadow: 0 8px 32px rgba(123,97,255,0.18);
-            padding: 2.5rem 2rem 2rem 2rem;
-            z-index: 1001;
-            min-width: 320px;
-            max-width: 95vw;
-            max-height: 95vh;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            backdrop-filter: var(--glass-blur);
-            border: 1.5px solid var(--outline);
+            flex-shrink: 0;
         }
-        .modal .close-modal {
-            position: absolute;
-            top: 1.2rem;
-            right: 1.5rem;
-            font-size: 2rem;
-            color: var(--outline);
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .modal .close-modal:hover {
-            color: var(--primary);
-        }
-        .modal h2 {
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
+        .nav-logo-mark .icon { color: #fff; font-size: 1rem; }
+        .nav-logo-name {
+            font-size: 1.15rem;
             font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--text);
         }
-        .modal .form-group {
-            margin-bottom: 1.2rem;
+        .nav-logo-name em {
+            font-style: normal;
+            color: var(--accent);
+        }
+
+        .nav-right {
             display: flex;
             align-items: center;
-            gap: 0.7rem;
+            gap: 0.625rem;
         }
-        .modal .form-group input {
-            width: 100%;
-            padding: 0.9rem 1.1rem;
-            border-radius: 1.2rem;
-            border: 1.5px solid var(--outline);
-            background: var(--surface-variant);
-            color: var(--on-surface);
-            font-size: 1rem;
-            outline: none;
-            transition: border 0.2s;
+        .nav-greeting {
+            font-size: 0.82rem;
+            color: var(--text-2);
+            font-weight: 500;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        .modal .form-group input:focus {
-            border: 2px solid var(--primary);
-        }
-        .modal .switch-link {
-            color: var(--primary);
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           BUTTONS
+        ═══════════════════════════════════════════════════════════════════════ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1.1rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.855rem;
+            font-weight: 500;
             cursor: pointer;
-            text-decoration: underline;
+            transition: background var(--t) var(--ease),
+                        box-shadow  var(--t) var(--ease),
+                        transform   var(--t) var(--ease),
+                        color       var(--t) var(--ease);
+            text-decoration: none;
+            white-space: nowrap;
+            line-height: 1;
+        }
+        .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(124,58,237,0.28);
+        }
+        .btn-primary:not(:disabled):hover {
+            background: var(--accent-dark);
+            box-shadow: 0 4px 16px rgba(124,58,237,0.38);
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-2);
+        }
+        .btn-ghost:not(:disabled):hover {
+            background: var(--accent-muted);
+            color: var(--accent);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--border-strong);
+        }
+        .btn-outline:not(:disabled):hover {
+            background: var(--accent-muted);
+        }
+
+        /* Icon-only square button */
+        .btn-icon {
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border-radius: var(--radius-xs);
+        }
+        .btn-icon .icon { font-size: 1rem; }
+
+        /* Big shorten CTA */
+        .btn-shorten {
+            height: 54px;
+            padding: 0 2rem;
+            font-size: 0.94rem;
+            font-weight: 600;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           HERO
+        ═══════════════════════════════════════════════════════════════════════ */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4.5rem 1.5rem 2.5rem;
+            text-align: center;
+        }
+
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: var(--accent-muted);
+            border: 1px solid rgba(124,58,237,0.18);
+            color: var(--accent);
+            border-radius: 100px;
+            padding: 0.28rem 0.9rem;
+            font-size: 0.775rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            margin-bottom: 1.5rem;
+        }
+        .hero-pill .icon { font-size: 0.85rem; }
+
+        .hero-headline {
+            font-size: clamp(2rem, 5.5vw, 3.4rem);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            line-height: 1.12;
+            color: var(--text);
+            margin-bottom: 1rem;
+            max-width: 620px;
+        }
+        .hero-headline span {
+            background: linear-gradient(130deg, var(--accent) 20%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
             font-size: 1rem;
+            color: var(--text-2);
+            max-width: 430px;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+            line-height: 1.65;
         }
-        .modal .switch-link:hover {
-            color: #5e47d6;
-        }
-        .modal .material-symbols-outlined {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-right: 0.5rem;
-        }
-        @media (max-width: 600px) {
-            .card, .dashboard, .glass-section {
-                padding: 1.2rem 0.5rem;
-            }
-            .main-content, .dashboard-page {
-                padding: 1.2rem 0.2rem 0.5rem 0.2rem;
-            }
-            .modal {
-                padding: 1.2rem 0.5rem;
-            }
-        }
-        .table-container {
+
+        /* ── Shorten card ─────────────────────────────────────────────────────── */
+        .shorten-card {
             width: 100%;
-            overflow-x: auto;
+            max-width: 700px;
+            border-radius: var(--radius-lg);
+            padding: 6px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 1rem;
         }
+
+        .shorten-input-row {
+            display: flex;
+            background: var(--surface-solid);
+            border-radius: 13px;
+            border: 1.5px solid var(--border);
+            overflow: hidden;
+            transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+        }
+        .shorten-input-row:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(124,58,237,0.09);
+        }
+
+        .url-input {
+            flex: 1;
+            min-width: 0;
+            height: 54px;
+            padding: 0 1.2rem;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text);
+            outline: none;
+        }
+        .url-input::placeholder { color: var(--text-3); }
+
+        /* ── Result card ──────────────────────────────────────────────────────── */
+        .result-card {
+            width: 100%;
+            max-width: 700px;
+            border-radius: var(--radius);
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 0.875rem;
+            display: none;
+            animation: fadeUp 0.25s var(--ease);
+        }
+        .result-card.error {
+            background: var(--error-bg);
+            border: 1px solid rgba(220,38,38,0.2);
+            color: var(--error);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.875rem;
+        }
+        .result-short-link {
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+            word-break: break-all;
+            line-height: 1.3;
+        }
+        .result-short-link:hover { text-decoration: underline; }
+
+        .result-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+
+        .result-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 0.875rem;
+        }
+
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+        .meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+            color: var(--text-2);
+        }
+        .meta-item .icon { font-size: 0.95rem; color: var(--accent); }
+        .meta-item.overflow {
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ── Login nudge ──────────────────────────────────────────────────────── */
+        .login-nudge {
+            display: none;
+            width: 100%;
+            max-width: 700px;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-sm);
+            background: var(--accent-muted);
+            border: 1px dashed rgba(124,58,237,0.22);
+            font-size: 0.84rem;
+            color: var(--text-2);
+            cursor: pointer;
+            transition: background var(--t) var(--ease), color var(--t) var(--ease);
+            animation: fadeUp 0.3s var(--ease);
+        }
+        .login-nudge:hover { background: rgba(124,58,237,0.13); color: var(--accent); }
+        .login-nudge .icon { font-size: 1rem; color: var(--accent); }
+        .login-nudge strong { color: var(--accent); font-weight: 600; }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           LINKS HISTORY SECTION
+        ═══════════════════════════════════════════════════════════════════════ */
+        .links-section {
+            display: none;
+            width: 100%;
+            max-width: 960px;
+            margin: 0.5rem auto 0;
+            padding: 0 1.5rem 4rem;
+            animation: fadeUp 0.3s var(--ease);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.875rem;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .section-title .icon { font-size: 1.05rem; color: var(--accent); }
+
+        .count-pill {
+            display: inline-block;
+            background: var(--accent-muted);
+            color: var(--accent);
+            border-radius: 100px;
+            padding: 0.1rem 0.55rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        /* ── Table ────────────────────────────────────────────────────────────── */
+        .table-shell {
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
         .links-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
+            font-size: 0.86rem;
         }
-        .links-table th, .links-table td {
-            padding: 0.8rem;
-            text-align: left;
-            border-bottom: 1px solid var(--outline);
+
+        .links-table thead {
+            background: rgba(124,58,237,0.04);
+        }
+        .links-table thead tr {
+            border-bottom: 1px solid var(--border);
         }
         .links-table th {
-            background: var(--primary-container);
-            color: var(--on-primary-container);
+            padding: 0.8rem 1.1rem;
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-2);
+            white-space: nowrap;
+        }
+        .links-table td {
+            padding: 0.9rem 1.1rem;
+            vertical-align: middle;
+            color: var(--text);
+        }
+        .links-table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background var(--t) var(--ease);
+        }
+        .links-table tbody tr:last-child { border-bottom: none; }
+        .links-table tbody tr:hover { background: var(--accent-muted); }
+
+        /* Column: short code */
+        .td-code {
+            max-width: 260px;
+        }
+        .td-code a {
+            display: block;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.86rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .td-code a:hover { text-decoration: underline; }
+
+        /* Column: original URL */
+        .td-url {
+            max-width: 300px;
+        }
+        .td-url a {
+            display: block;
+            color: var(--text-2);
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: color var(--t) var(--ease);
+        }
+        .td-url a:hover { color: var(--text); }
+
+        /* Column: created */
+        .td-time { color: var(--text-2); white-space: nowrap; }
+
+        /* Column: clicks */
+        .td-clicks {
+            white-space: nowrap;
+        }
+        .clicks-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
             font-weight: 600;
         }
-        .links-table tr:hover {
-            background: var(--surface-variant);
+        .clicks-badge .icon { font-size: 0.9rem; color: var(--accent); }
+
+        /* Column: actions — only visible on row hover */
+        .td-actions {
+            text-align: right;
+            padding-right: 0.875rem;
         }
-        .links-table a {
-            color: var(--primary);
+        .td-actions .btn { opacity: 0; transition: opacity var(--t) var(--ease); }
+        .links-table tbody tr:hover .td-actions .btn { opacity: 1; }
+
+        /* Empty state */
+        .empty-state {
+            padding: 3.5rem 1rem;
+            text-align: center;
+        }
+        .empty-state .icon {
+            font-size: 2.5rem;
+            color: var(--text-3);
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+        .empty-state p { font-size: 0.875rem; color: var(--text-2); }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           AUTH MODAL
+        ═══════════════════════════════════════════════════════════════════════ */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(13, 7, 32, 0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-backdrop.open { display: flex; }
+
+        .modal {
+            background: var(--surface-solid);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 390px;
+            padding: 2rem 1.875rem 1.875rem;
+            position: relative;
+            animation: modalIn 0.22s var(--ease);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to   { opacity: 1; transform: scale(1)    translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.1rem;
+            right: 1.1rem;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            border-radius: var(--radius-xs);
+            color: var(--text-3);
+            cursor: pointer;
+            transition: background var(--t) var(--ease), color var(--t) var(--ease);
+        }
+        .modal-close:hover { background: var(--accent-muted); color: var(--accent); }
+        .modal-close .icon { font-size: 1.1rem; }
+
+        /* Modal logo row */
+        .modal-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 1.5rem;
+        }
+        .modal-brand-mark {
+            width: 26px;
+            height: 26px;
+            background: var(--accent);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-brand-mark .icon { font-size: 0.9rem; color: #fff; }
+        .modal-brand-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--text);
+        }
+        .modal-brand-name em { font-style: normal; color: var(--accent); }
+
+        .modal-heading {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+        }
+        .modal-sub {
+            font-size: 0.85rem;
+            color: var(--text-2);
+            margin-bottom: 1.625rem;
+        }
+
+        /* Form elements */
+        .form-group { margin-bottom: 0.875rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+        .form-label {
+            display: block;
+            font-size: 0.775rem;
+            font-weight: 500;
+            color: var(--text-2);
+            margin-bottom: 0.35rem;
+        }
+        .form-input {
+            width: 100%;
+            height: 42px;
+            padding: 0 0.9rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: white;
+            font-family: inherit;
+            font-size: 0.88rem;
+            color: var(--text);
+            outline: none;
+            transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+        }
+        .form-input::placeholder { color: var(--text-3); }
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+        }
+
+        .btn-full { width: 100%; height: 42px; margin-top: 0.25rem; }
+
+        .modal-switch {
+            margin-top: 1.25rem;
+            text-align: center;
+            font-size: 0.84rem;
+            color: var(--text-2);
+        }
+        .modal-switch a {
+            color: var(--accent);
+            font-weight: 500;
             text-decoration: none;
+            cursor: pointer;
         }
-        .links-table a:hover {
-            text-decoration: underline;
+        .modal-switch a:hover { text-decoration: underline; }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           FOOTER
+        ═══════════════════════════════════════════════════════════════════════ */
+        .footer {
+            margin-top: auto;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-size: 0.775rem;
+            color: var(--text-3);
+            border-top: 1px solid var(--border);
         }
+        .footer a { color: var(--accent); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════════════════════════════════════════ */
+        /* ── Tablet (≤ 900px) ──────────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .links-section { max-width: 100%; }
+
+            /* Table: always allow horizontal scroll on constrained widths */
+            .table-shell {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            /* Keep enough room so columns don't collapse */
+            .links-table { min-width: 560px; }
+
+            .td-code    { max-width: 200px; }
+            .td-url     { max-width: 200px; }
+        }
+
+        /* ── Mobile (≤ 640px) ──────────────────────────────────────────────── */
+        @media (max-width: 640px) {
+            /* Navbar */
+            .navbar { padding: 0 1rem; height: 54px; }
+            .nav-greeting { display: none; }
+            .nav-right { gap: 0.4rem; }
+            .btn { padding: 0.44rem 0.9rem; font-size: 0.82rem; }
+
+            /* Hero — tighter side padding so the card fills more screen width */
+            .hero { padding: 2rem 0.625rem 1.75rem; }
+            .hero-pill { font-size: 0.74rem; padding: 0.26rem 0.8rem; }
+            .hero-headline { font-size: 1.85rem; margin-bottom: 0.875rem; }
+            .hero-sub { font-size: 0.875rem; margin-bottom: 1.75rem; }
+
+            /* Shorten card — stack input above button, taller touch targets */
+            .shorten-card { padding: 5px; border-radius: var(--radius); }
+            .shorten-input-row {
+                flex-direction: column;
+                border-radius: 12px;
+            }
+            .url-input {
+                height: 62px;
+                min-height: 62px;
+                -webkit-appearance: none;
+                appearance: none;
+                padding: 0 1.1rem;
+                font-size: 1rem;
+                border-bottom: 1px solid var(--border);
+                border-radius: 12px 12px 0 0;
+            }
+            .btn-shorten {
+                width: 100%;
+                height: 62px;
+                min-height: 62px;
+                border-radius: 0 0 12px 12px;
+                justify-content: center;
+                font-size: 1rem;
+            }
+
+            /* Result card */
+            .result-card { padding: 1rem; }
+            .result-top {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+            .result-short-link { font-size: 1rem; }
+            .result-actions {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 0.5rem;
+            }
+            .result-actions .btn:first-child { justify-content: center; }
+            .result-meta { gap: 0.875rem; }
+            .meta-item.overflow { max-width: 100%; }
+
+            /* Login nudge */
+            .login-nudge {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.375rem;
+                padding: 0.875rem 1rem;
+            }
+            .login-nudge .icon:last-child { display: none; }
+
+            /* Links section */
+            .links-section { padding: 0 0.75rem 3rem; }
+            .section-header { flex-wrap: wrap; gap: 0.5rem; }
+
+            /* Table: scroll container + trim columns */
+            .table-shell { border-radius: var(--radius-sm); }
+            .links-table { min-width: 440px; font-size: 0.82rem; }
+            .links-table th, .links-table td { padding: 0.75rem 0.875rem; }
+
+            /* Hide Created and Actions columns — keeps Short Link + URL + Clicks */
+            .links-table .col-time,
+            .links-table .col-actions { display: none; }
+            .td-code { max-width: 170px; }
+            .td-url  { max-width: 160px; }
+
+            /* Modal */
+            .modal { padding: 1.6rem 1.1rem 1.4rem; max-width: 95vw; }
+            .modal-heading { font-size: 1.2rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .form-input { height: 44px; }
+        }
+
+        /* ── Very small phones (≤ 380px) ───────────────────────────────────── */
+        @media (max-width: 380px) {
+            .hero-headline { font-size: 1.65rem; }
+            .btn-shorten   { font-size: 0.88rem; }
+            .links-table   { min-width: 380px; font-size: 0.78rem; }
+            .td-code       { max-width: 130px; }
+            .td-url        { max-width: 110px; }
+        }
+
+        /* Loading spinner */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinning { animation: spin 0.8s linear infinite; display: inline-block; }
     </style>
 </head>
 <body>
-    <!-- Header/Navbar -->
+<div id="app">
+
+    <!-- ═══ NAVBAR ═══════════════════════════════════════════════════════════ -->
     <nav class="navbar">
-        <a href="#" class="logo">
-            <span class="material-symbols-outlined" id="savedLinksIcon" style="display:none;cursor:pointer;">bookmarks</span>
-            Clik
+        <a class="nav-logo" onclick="goHome()">
+            <div class="nav-logo-mark">
+                <span class="icon">link</span>
+            </div>
+            <span class="nav-logo-name">cli<em>k</em></span>
         </a>
-        <div class="nav-actions" id="navActions">
-            <span class="material-symbols-outlined" id="loginBtn" title="Login">account_circle</span>
+        <div class="nav-right" id="navRight">
+            <button class="btn btn-ghost" onclick="openModal('login')">Log in</button>
+            <button class="btn btn-primary" onclick="openModal('register')">
+                <span class="icon" style="font-size:0.95rem;">person_add</span>
+                Sign up
+            </button>
         </div>
     </nav>
 
-    <main class="main-content" id="mainPage">
-        <!-- Shorten URL Card -->
-        <section class="card" id="shortenCard">
-            <div class="card-title">Shorten your URL</div>
-            <div class="input-group">
-                <input type="url" id="longUrl" class="input" placeholder="Paste your long URL here...">
-                <button class="button" onclick="shortenUrl()">Shorten</button>
-            </div>
-            <div id="shortUrlResult" class="result" style="display:none;"></div>
-        </section>
+    <!-- ═══ HERO ══════════════════════════════════════════════════════════════ -->
+    <section class="hero" id="heroSection">
+        <div class="hero-pill">
+            <span class="icon">bolt</span>
+            Fast · Open source · No tracking
+        </div>
 
-        <!-- User Links Table -->
-        <section class="card" id="userLinksCard" style="display:none;">
-            <div class="card-title">Your Shortened Links</div>
-            <div class="table-container">
-                <table class="links-table">
-                    <thead>
-                        <tr>
-                            <th>Short Code</th>
-                            <th>Original URL</th>
-                            <th>Created At</th>
-                            <th>Clicks</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userLinksTableBody">
-                        <!-- Links will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+        <h1 class="hero-headline">
+            Shorten. Share.<br><span>Track your links.</span>
+        </h1>
 
-    <!-- Saved Links Page (hidden by default) -->
-    <div class="dashboard-page" id="savedLinksPage" style="display:none;">
-        <section class="dashboard">
-            <div class="dashboard-title">Your Saved Links</div>
+        <p class="hero-sub">
+            Paste a long URL and get a short one instantly — no account needed.
+            Log in to see your full link history and click counts.
+        </p>
+
+        <!-- URL shortener input -->
+        <div class="glass shorten-card">
+            <div class="shorten-input-row">
+                <input
+                    type="url"
+                    id="urlInput"
+                    class="url-input"
+                    placeholder="https://your-very-long-url.com/paste/it/here"
+                    name="url"
+                    autocomplete="url"
+                    autocorrect="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    data-lpignore="true"
+                    data-form-type="other"
+                    onkeydown="if(event.key==='Enter') doShorten()"
+                >
+                <button class="btn btn-primary btn-shorten" id="shortenBtn" onclick="doShorten()">
+                    <span class="icon" style="font-size:1.05rem;" id="shortenBtnIcon">bolt</span>
+                    <span id="shortenBtnLabel">Shorten</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Result (populated after shortening) -->
+        <div class="glass result-card" id="resultCard"></div>
+
+        <!-- Nudge anonymous users to log in -->
+        <div class="login-nudge" id="loginNudge" onclick="openModal('login')">
+            <span class="icon">bookmark_add</span>
+            <span><strong>Log in</strong> to save this link and track clicks over time</span>
+            <span class="icon" style="font-size:0.9rem;">arrow_forward</span>
+        </div>
+    </section>
+
+    <!-- ═══ LINKS HISTORY (logged-in only) ══════════════════════════════════ -->
+    <section class="links-section" id="linksSection">
+        <div class="section-header">
+            <div class="section-title">
+                <span class="icon">history</span>
+                Your Links
+                <span class="count-pill" id="countPill">0</span>
+            </div>
+            <button class="btn btn-ghost" style="font-size:0.8rem;" onclick="fetchUserLinks()">
+                <span class="icon" style="font-size:1rem;">refresh</span>
+                Refresh
+            </button>
+        </div>
+
+        <div class="glass table-shell">
             <table class="links-table" id="linksTable">
                 <thead>
                     <tr>
-                        <th>Short Link</th>
+                        <th>Short link</th>
                         <th>Original URL</th>
+                        <th class="col-time">Created</th>
                         <th>Clicks</th>
+                        <th class="col-actions"></th>
                     </tr>
                 </thead>
-                <tbody id="linksTableBody">
-                    <!-- Populated by JS -->
-                </tbody>
+                <tbody id="linksBody"></tbody>
             </table>
-        </section>
-    </div>
+        </div>
+    </section>
 
-    <!-- Login/Register Modal -->
-    <div class="modal-overlay" id="modalOverlay"></div>
-    <div class="modal" id="authModal">
-        <span class="close-modal" onclick="closeAuthModal()">&times;</span>
-        <div id="loginForm">
-            <h2><span class="material-symbols-outlined">login</span>Login to Clik</h2>
+    <!-- ═══ FOOTER ════════════════════════════════════════════════════════════ -->
+    <footer class="footer">
+        <strong>clik</strong> &mdash; open-source URL shortener &nbsp;·&nbsp;
+        Built with <a href="https://spring.io/projects/spring-boot" target="_blank" rel="noopener">Spring Boot</a>
+    </footer>
+
+</div><!-- #app -->
+
+<!-- ═══ AUTH MODAL ═══════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="handleBackdropClick(event)">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+        <button class="modal-close" onclick="closeModal()" aria-label="Close">
+            <span class="icon">close</span>
+        </button>
+
+        <!-- Brand mark inside modal -->
+        <div class="modal-brand">
+            <div class="modal-brand-mark"><span class="icon">link</span></div>
+            <span class="modal-brand-name">cli<em>k</em></span>
+        </div>
+
+        <!-- ── Login form ──────────────────────────────────────────────────── -->
+        <div id="modalLoginForm">
+            <h2 class="modal-heading" id="modalTitle">Welcome back</h2>
+            <p class="modal-sub">Sign in to manage your short links.</p>
+
             <div class="form-group">
-                <span class="material-symbols-outlined">mail</span>
-                <input type="email" id="loginEmail" placeholder="Email">
+                <label class="form-label" for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" class="form-input"
+                       name="username" placeholder="you@example.com" autocomplete="email"
+                       onkeydown="if(event.key==='Enter') doLogin()">
             </div>
             <div class="form-group">
-                <span class="material-symbols-outlined">lock</span>
-                <input type="password" id="loginPassword" placeholder="Password">
+                <label class="form-label" for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" class="form-input"
+                       name="password" placeholder="••••••••" autocomplete="current-password"
+                       onkeydown="if(event.key==='Enter') doLogin()">
             </div>
-            <button class="button" style="width:100%;margin-top:1.2rem;" onclick="login()">Login</button>
-            <div style="text-align:center; margin-top:1.5rem;">
-                <span class="switch-link" onclick="switchForm('register')">Don't have an account? Register</span>
+            <button class="btn btn-primary btn-full" onclick="doLogin()">Sign in</button>
+            <p class="modal-switch">
+                No account? <a onclick="switchModalForm('register')">Sign up free →</a>
+            </p>
+        </div>
+
+        <!-- ── Register form ───────────────────────────────────────────────── -->
+        <div id="modalRegisterForm" style="display:none;">
+            <h2 class="modal-heading">Create account</h2>
+            <p class="modal-sub">Free, forever. No credit card needed.</p>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="regFirstName">First name</label>
+                    <input type="text" id="regFirstName" class="form-input"
+                           placeholder="Jane" autocomplete="given-name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="regLastName">Last name</label>
+                    <input type="text" id="regLastName" class="form-input"
+                           placeholder="Doe" autocomplete="family-name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="regEmail">Email</label>
+                <input type="email" id="regEmail" class="form-input"
+                       placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="regPassword">Password</label>
+                <input type="password" id="regPassword" class="form-input"
+                       placeholder="Min. 8 characters" autocomplete="new-password"
+                       onkeydown="if(event.key==='Enter') doRegister()">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="doRegister()">Create account</button>
+            <p class="modal-switch">
+                Already have an account? <a onclick="switchModalForm('login')">Sign in →</a>
+            </p>
+        </div>
+
+    </div>
+</div><!-- .modal-backdrop -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ── Global state ──────────────────────────────────────────────────────────────
+// null  → anonymous visitor
+// {...} → { userId, email, firstName, lastName } after login/session restore
+let user = null;
+
+// Holds the last successfully shortened URL so the copy button can reference it
+// without embedding the URL string inside an onclick attribute.
+let lastShortUrl = '';
+
+// ── Startup ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', checkSession);
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function goHome() {
+    document.getElementById('urlInput').focus();
+}
+
+// ── Modal helpers ─────────────────────────────────────────────────────────────
+function openModal(form) {
+    switchModalForm(form);
+    document.getElementById('modalBackdrop').classList.add('open');
+    // Focus first input after animation
+    setTimeout(() => {
+        const first = document.querySelector('#modal' + cap(form) + 'Form input');
+        if (first) first.focus();
+    }, 120);
+}
+
+function closeModal() {
+    document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+function handleBackdropClick(e) {
+    if (e.target === document.getElementById('modalBackdrop')) closeModal();
+}
+
+function switchModalForm(form) {
+    document.getElementById('modalLoginForm').style.display    = form === 'login'    ? 'block' : 'none';
+    document.getElementById('modalRegisterForm').style.display = form === 'register' ? 'block' : 'none';
+}
+
+// ── URL shortening ─────────────────────────────────────────────────────────────
+async function doShorten() {
+    const input  = document.getElementById('urlInput');
+    const longUrl = input.value.trim();
+    if (!longUrl) {
+        renderError('Please paste a URL first.');
+        input.focus();
+        return;
+    }
+
+    setShortenLoading(true);
+
+    try {
+        const res = await fetch('/api/shorten', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ longUrl })
+        });
+
+        if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            renderError(body.message || 'Could not shorten that URL. Please try again.');
+            return;
+        }
+
+        const data = await res.json();
+        lastShortUrl = data.shortUrl;
+        renderResult(data);
+
+        // Refresh the logged-in user's history table
+        if (user) fetchUserLinks();
+
+    } catch (_) {
+        renderError('Network error — check your connection and try again.');
+    } finally {
+        setShortenLoading(false);
+    }
+}
+
+function setShortenLoading(on) {
+    const btn   = document.getElementById('shortenBtn');
+    const icon  = document.getElementById('shortenBtnIcon');
+    const label = document.getElementById('shortenBtnLabel');
+    btn.disabled  = on;
+    icon.className  = on ? 'icon spinning' : 'icon';
+    icon.textContent  = on ? 'progress_activity' : 'bolt';
+    label.textContent = on ? 'Shortening…' : 'Shorten';
+}
+
+function renderResult(data) {
+    const card    = document.getElementById('resultCard');
+    const clicks  = data.clickCount  ?? 0;
+    const created = data.createdAt ? relTime(new Date(data.createdAt)) : 'just now';
+
+    card.className   = 'glass result-card';
+    card.style.display = 'block';
+    card.innerHTML = `
+        <div class="result-top">
+            <a href="${esc(data.shortUrl)}" target="_blank" rel="noopener" class="result-short-link">
+                ${ esc(data.shortUrl) }
+            </a>
+            <div class="result-actions">
+                <button class="btn btn-outline" id="copyResultBtn"
+                        style="font-size:0.82rem;padding:0.42rem 0.9rem;"
+                        onclick="copyLastUrl(this)">
+                    <span class="icon" style="font-size:0.95rem;">content_copy</span>
+                    Copy
+                </button>
+                <a href="${esc(data.shortUrl)}" target="_blank" rel="noopener"
+                   class="btn btn-ghost btn-icon" title="Open link">
+                    <span class="icon" style="font-size:1rem;">open_in_new</span>
+                </a>
             </div>
         </div>
-        <div id="registerForm" style="display:none;">
-            <h2><span class="material-symbols-outlined">person_add</span>Sign Up for Clik</h2>
-            <div class="form-group">
-                <span class="material-symbols-outlined">person</span>
-                <input type="text" id="firstName" placeholder="First Name">
-            </div>
-            <div class="form-group">
-                <span class="material-symbols-outlined">person</span>
-                <input type="text" id="lastName" placeholder="Last Name">
-            </div>
-            <div class="form-group">
-                <span class="material-symbols-outlined">mail</span>
-                <input type="email" id="email" placeholder="Email">
-            </div>
-            <div class="form-group">
-                <span class="material-symbols-outlined">lock</span>
-                <input type="password" id="password" placeholder="Password">
-            </div>
-            <button class="button outline" style="width:100%;margin-top:1.2rem;" onclick="registerUser()">Register</button>
-            <div style="text-align:center; margin-top:1.5rem;">
-                <span class="switch-link" onclick="switchForm('login')">Already have an account? Login</span>
-            </div>
+        <div class="result-divider"></div>
+        <div class="result-meta">
+            <span class="meta-item overflow" title="${esc(data.longUrl)}">
+                <span class="icon">link</span>
+                ${ esc(trunc(data.longUrl, 52)) }
+            </span>
+            <span class="meta-item">
+                <span class="icon">schedule</span>
+                ${ created }
+            </span>
+            <span class="meta-item">
+                <span class="icon">ads_click</span>
+                ${ clicks.toLocaleString() } click${ clicks !== 1 ? 's' : '' }
+            </span>
         </div>
-    </div>
+    `;
 
-    <!-- Template for dashboard row -->
-    <template id="linkRowTemplate">
-        <tr>
-            <td><a href="" target="_blank" class="short-link"></a></td>
-            <td><a href="" target="_blank" class="long-link"></a></td>
-            <td class="click-count"></td>
-        </tr>
-    </template>
+    // Show "log in" nudge only for anonymous visitors
+    document.getElementById('loginNudge').style.display = user ? 'none' : 'flex';
+}
 
-    <script>
-        // --- UI State ---
-        let user = null;
-        let currentPage = 'main'; // 'main' or 'savedLinks'
+function renderError(msg) {
+    const card = document.getElementById('resultCard');
+    card.className   = 'result-card error';
+    card.style.display = 'block';
+    card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <span class="icon">error</span> ${ esc(msg) }
+        </div>`;
+    document.getElementById('loginNudge').style.display = 'none';
+}
 
-        // --- Modal Logic ---
-        function openAuthModal(type) {
-            document.getElementById('modalOverlay').style.display = 'block';
-            document.getElementById('authModal').style.display = 'flex';
-            switchForm(type);
-        }
-        function closeAuthModal() {
-            document.getElementById('modalOverlay').style.display = 'none';
-            document.getElementById('authModal').style.display = 'none';
-        }
-        function switchForm(type) {
-            if (type === 'login') {
-                document.getElementById('loginForm').style.display = 'block';
-                document.getElementById('registerForm').style.display = 'none';
-            } else {
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('registerForm').style.display = 'block';
-            }
-        }
+// ── Auth: login ───────────────────────────────────────────────────────────────
+async function doLogin() {
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) { showFormError('loginError', 'Please fill in both fields.'); return; }
 
-        // --- Navbar Actions ---
-        document.getElementById('loginBtn').onclick = () => openAuthModal('login');
-        document.getElementById('savedLinksIcon').onclick = () => showPage('savedLinks');
-        document.querySelector('.logo').onclick = (e) => {
-            e.preventDefault();
-            if (user) showPage('main');
-        };
+    try {
+        const res = await fetch('/api/users/login', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ email, password })
+        });
+        if (res.ok) {
+            user = await res.json();
+            closeModal();
+            onLoggedIn();
+        } else {
+            alert('Invalid email or password. Please try again.');
+        }
+    } catch (e) {
+        alert('Network error: ' + e.message);
+    }
+}
 
-        // --- SPA Router ---
-        function showPage(page) {
-            currentPage = page;
-            if (page === 'main') {
-                document.getElementById('mainPage').style.display = 'flex';
-                document.getElementById('savedLinksPage').style.display = 'none';
-            } else if (page === 'savedLinks') {
-                document.getElementById('mainPage').style.display = 'none';
-                document.getElementById('savedLinksPage').style.display = 'flex';
-                fetchUserLinks();
-            }
-        }
+// ── Auth: register ────────────────────────────────────────────────────────────
+async function doRegister() {
+    const firstName = document.getElementById('regFirstName').value.trim();
+    const lastName  = document.getElementById('regLastName').value.trim();
+    const email     = document.getElementById('regEmail').value.trim();
+    const password  = document.getElementById('regPassword').value;
 
-        // --- Shorten URL ---
-        async function shortenUrl() {
-            const longUrl = document.getElementById('longUrl').value.trim();
-            if (!longUrl) {
-                showResult('Please enter a URL.', true);
-                return;
-            }
-            try {
-                const response = await fetch('/api/shorten', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ longUrl })
-                });
-                if (response.ok) {
-                    const shortUrl = await response.text();
-                    showResult(`<b>Your shortened URL:</b><br><a href="${shortUrl}" target="_blank">${shortUrl}</a>`);
-                } else {
-                    showResult('Failed to shorten URL.', true);
-                }
-            } catch (e) {
-                showResult('Error: ' + e.message, true);
-            }
-        }
-        function showResult(msg, isError) {
-            const resultDiv = document.getElementById('shortUrlResult');
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = msg;
-            resultDiv.style.background = isError ? 'var(--error)' : 'var(--primary-container)';
-            resultDiv.style.color = isError ? 'var(--on-error)' : 'var(--on-primary-container)';
-        }
+    if (!firstName || !lastName || !email || !password) {
+        alert('Please fill in all fields.'); return;
+    }
 
-        // --- Registration ---
-        async function registerUser() {
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            if (!firstName || !lastName || !email || !password) {
-                alert('Please fill in all fields');
-                return;
-            }
-            try {
-                const response = await fetch('/api/users/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ firstName, lastName, email, password })
-                });
-                if (response.ok) {
-                    alert('Registration successful! Please login.');
-                    switchForm('login');
-                } else {
-                    alert('Registration failed.');
-                }
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
+    try {
+        const res = await fetch('/api/users/register', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ firstName, lastName, email, password })
+        });
+        if (res.ok) {
+            alert('Account created! You can now log in.');
+            switchModalForm('login');
+            document.getElementById('loginEmail').value = email;
+        } else {
+            alert('Registration failed — that email may already be in use.');
         }
+    } catch (e) {
+        alert('Network error: ' + e.message);
+    }
+}
 
-        // --- Login ---
-        async function login() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            if (!email || !password) {
-                alert('Please fill in all fields');
-                return;
-            }
-            try {
-                const response = await fetch('/api/users/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                if (response.ok) {
-                    user = await response.json();
-                    closeAuthModal();
-                    document.getElementById('userLinksCard').style.display = 'block';
-                    fetchUserLinks();
-                } else {
-                    alert('Invalid credentials.');
-                }
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
-        }
+// ── Auth: logout ──────────────────────────────────────────────────────────────
+async function doLogout() {
+    try { await fetch('/api/users/logout', { method: 'POST' }); } finally {
+        user = null;
+        onLoggedOut();
+    }
+}
 
-        // --- Logout ---
-        function logout() {
-            fetch('/api/users/logout', { method: 'POST' }).finally(() => {
-                user = null;
-                document.getElementById('userLinksCard').style.display = 'none';
-                document.getElementById('userLinksTableBody').innerHTML = '';
-            });
-        }
+// ── UI transitions ─────────────────────────────────────────────────────────────
+function onLoggedIn() {
+    const name = user.firstName || user.email.split('@')[0];
+    document.getElementById('navRight').innerHTML = `
+        <span class="nav-greeting">Hi, ${ esc(name) } 👋</span>
+        <button class="btn btn-ghost" onclick="doLogout()">
+            <span class="icon" style="font-size:1rem;">logout</span>
+            Log out
+        </button>
+    `;
+    document.getElementById('linksSection').style.display  = 'block';
+    document.getElementById('loginNudge').style.display    = 'none';
+    fetchUserLinks();
+}
 
-        // --- Dashboard Logic ---
-        async function fetchUserLinks() {
-            if (!user) return;
-            
-            try {
-                const response = await fetch(`/api/users/links/${user.email}`);
-                if (response.ok) {
-                    const links = await response.json();
-                    renderUserLinks(links);
-                } else {
-                    const error = await response.json();
-                    console.error('Error fetching links:', error.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-        function renderUserLinks(links) {
-            const tbody = document.getElementById('userLinksTableBody');
-            tbody.innerHTML = '';
-            
-            links.forEach(link => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><a href="/s/${link.shortCode}" target="_blank">${link.shortCode}</a></td>
-                    <td><a href="${link.longUrl}" target="_blank">${link.longUrl}</a></td>
-                    <td>${new Date(link.createdAt).toLocaleString()}</td>
-                    <td>${link.clickCount}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+function onLoggedOut() {
+    document.getElementById('navRight').innerHTML = `
+        <button class="btn btn-ghost" onclick="openModal('login')">Log in</button>
+        <button class="btn btn-primary" onclick="openModal('register')">
+            <span class="icon" style="font-size:0.95rem;">person_add</span>
+            Sign up
+        </button>
+    `;
+    document.getElementById('linksSection').style.display = 'none';
+    document.getElementById('linksBody').innerHTML         = '';
+}
 
-        // --- UI State Management ---
-        function updateUIForLogin() {
-            document.getElementById('navActions').innerHTML = `
-                <span class="material-symbols-outlined" id="logoutBtn" title="Logout">logout</span>
-            `;
-            document.getElementById('logoutBtn').onclick = logout;
-            document.getElementById('savedLinksIcon').style.display = 'inline-flex';
+// ── Session restore on page load ──────────────────────────────────────────────
+// Calls GET /api/users/me — 200 if a valid session cookie exists, 401 otherwise.
+async function checkSession() {
+    try {
+        const res = await fetch('/api/users/me');
+        if (res.ok) {
+            user = await res.json();
+            onLoggedIn();
         }
-        function updateUIForLogout() {
-            document.getElementById('navActions').innerHTML = `
-                <span class="material-symbols-outlined" id="loginBtn" title="Login">account_circle</span>
-            `;
-            document.getElementById('loginBtn').onclick = () => openAuthModal('login');
-            document.getElementById('savedLinksIcon').style.display = 'none';
-        }
+        // 401 → stay anonymous; anonymous UI is already the default
+    } catch (_) { /* network error on load — stay anonymous */ }
+}
 
-        // --- Session Check on Load ---
-        async function checkSession() {
-            try {
-                const response = await fetch('/api/users/links');
-                if (response.ok) {
-                    user = true;
-                    document.getElementById('userLinksCard').style.display = 'block';
-                    fetchUserLinks();
-                } else {
-                    user = null;
-                    document.getElementById('userLinksCard').style.display = 'none';
-                }
-            } catch {
-                user = null;
-                document.getElementById('userLinksCard').style.display = 'none';
-            }
+// ── Link history ──────────────────────────────────────────────────────────────
+// Calls GET /api/users/links — session-scoped, no email in the URL.
+async function fetchUserLinks() {
+    if (!user) return;
+    try {
+        const res = await fetch('/api/users/links');
+        if (res.ok) {
+            renderLinks(await res.json());
+        } else if (res.status === 401) {
+            // Session expired on server — force logout locally
+            user = null;
+            onLoggedOut();
         }
-        checkSession();
-    </script>
+    } catch (e) {
+        console.error('fetchUserLinks failed:', e);
+    }
+}
+
+function renderLinks(links) {
+    const tbody = document.getElementById('linksBody');
+    document.getElementById('countPill').textContent = links.length;
+
+    if (links.length === 0) {
+        tbody.innerHTML = `
+            <tr><td colspan="5">
+                <div class="empty-state">
+                    <span class="icon">link_off</span>
+                    <p>No links yet — shorten your first URL above!</p>
+                </div>
+            </td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = links.map(link => {
+        const shortUrl = window.location.origin + '/s/' + link.shortCode;
+        const clicks   = (link.clickCount ?? 0).toLocaleString();
+        const time     = link.createdAt ? relTime(new Date(link.createdAt)) : '—';
+
+        return `
+            <tr>
+                <td class="td-code">
+                    <a href="/s/${ esc(link.shortCode) }" target="_blank" rel="noopener"
+                       title="${ esc(shortUrl) }">
+                        ${ esc(shortUrl) }
+                    </a>
+                </td>
+                <td class="td-url">
+                    <a href="${ esc(link.longUrl) }" target="_blank" rel="noopener"
+                       title="${ esc(link.longUrl) }">
+                        ${ esc(trunc(link.longUrl, 56)) }
+                    </a>
+                </td>
+                <td class="td-time col-time">${ time }</td>
+                <td class="td-clicks">
+                    <span class="clicks-badge">
+                        <span class="icon">ads_click</span>${ clicks }
+                    </span>
+                </td>
+                <td class="td-actions col-actions">
+                    <button class="btn btn-ghost btn-icon"
+                            title="Copy short link"
+                            data-copy="${ esc(shortUrl) }"
+                            onclick="copyFromDataAttr(this)">
+                        <span class="icon">content_copy</span>
+                    </button>
+                </td>
+            </tr>`;
+    }).join('');
+}
+
+// ── Clipboard helpers ─────────────────────────────────────────────────────────
+async function copyLastUrl(btn) {
+    if (!lastShortUrl) return;
+    await copyText(lastShortUrl, btn, 'Copy', 'Copied!');
+}
+
+async function copyFromDataAttr(btn) {
+    const url = btn.getAttribute('data-copy');
+    if (url) await copyText(url, btn, null, null);
+}
+
+async function copyText(text, btn, defaultLabel, copiedLabel) {
+    try {
+        await navigator.clipboard.writeText(text);
+        const prev = btn.innerHTML;
+        if (defaultLabel && copiedLabel) {
+            btn.innerHTML = btn.innerHTML.replace(defaultLabel, copiedLabel)
+                                         .replace('content_copy', 'check');
+        } else {
+            btn.innerHTML = '<span class="icon">check</span>';
+        }
+        setTimeout(() => { btn.innerHTML = prev; }, 2000);
+    } catch (_) { /* clipboard unavailable — silent */ }
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+// Sanitize user-provided strings before setting innerHTML
+function esc(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function trunc(str, max) {
+    if (!str) return '';
+    return str.length > max ? str.slice(0, max) + '…' : str;
+}
+
+function cap(str) {
+    return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+}
+
+// Human-readable relative time: "just now", "5m ago", "2h ago", "3d ago", or a date
+function relTime(date) {
+    const s = Math.floor((Date.now() - date) / 1000);
+    if (s < 10)     return 'just now';
+    if (s < 60)     return s + 's ago';
+    if (s < 3600)   return Math.floor(s / 60)   + 'm ago';
+    if (s < 86400)  return Math.floor(s / 3600)  + 'h ago';
+    if (s < 604800) return Math.floor(s / 86400) + 'd ago';
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+</script>
 </body>
-</html> 
+</html>

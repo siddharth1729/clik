@@ -4,13 +4,14 @@ package in.siddharthsabron.clik.controllers;
 import in.siddharthsabron.clik.services.ShortenerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/a")
+@Controller
+@RequestMapping("/s")
 public class RedirectController {
 
     private static final Logger logger = LoggerFactory.getLogger(RedirectController.class);

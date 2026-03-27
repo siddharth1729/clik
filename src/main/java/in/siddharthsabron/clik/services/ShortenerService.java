@@ -57,62 +57,57 @@ public class ShortenerService {
   }
 
   /**
-   * Shortens a URL for a registered user.
+   * Shortens a URL for a registered user, or anonymously when userId is null.
    *
    * @param longUrl The URL to shorten.
-   * @param userId  The ID of the registered user.
-   * @return The generated short code.
-   * @throws IllegalArgumentException If the user is not found.
+   * @param userId  The ID of the registered user, or null for anonymous.
+   * @return The persisted {@link ShortUrl} entity.
    */
   @Transactional
-  public String shortenUrl(String longUrl, Long userId) {
+  public ShortUrl shortenUrl(String longUrl, Long userId) {
     Optional<User> user = userRepository.findByUserId(userId);
     if (user.isEmpty()) {
-      throw new IllegalArgumentException("User not found with ID: " + userId);
-    }
-    else{
+      logger.info("No user found for ID: {} — creating anonymous link", userId);
+    } else {
       logger.info("Shortening URL for user: {}", user.get().getUserId());
     }
-  
     return shortenUrlInternal(longUrl, user.orElse(null));
   }
 
-     /**s
+  /**
    * Shortens a URL anonymously (without user association).
    *
    * @param longUrl The URL to shorten.
-   * @return The generated short code.
+   * @return The persisted {@link ShortUrl} entity.
    */
   @Transactional
-  public String shortenUrl(String longUrl) {
-    return shortenUrlInternal(longUrl, null); // Pass null for the user
+  public ShortUrl shortenUrl(String longUrl) {
+    return shortenUrlInternal(longUrl, null);
   }
 
   /**
-   * Internal method to handle URL shortening, shared by both user and anonymous
-   * cases.
+   * Internal method to handle URL shortening, shared by both user and anonymous cases.
    *
    * @param longUrl The URL to shorten.
    * @param user    The User object (can be null for anonymous links).
-   * @return The generated short code.
+   * @return The persisted (or pre-existing) {@link ShortUrl} entity.
    */
-  private String shortenUrlInternal(String longUrl, User user) {
+  private ShortUrl shortenUrlInternal(String longUrl, User user) {
     byte[] longUrlHash = calculateHash(longUrl);
     int shardId = getShardId(longUrlHash);
 
     Optional<ShortUrl> existingLink = shortUrlRepository.findByShardIdAndLongUrlHashForUpdate(shardId, longUrlHash);
 
     if (existingLink.isPresent()) {
-      return existingLink.get().getShortCode();
+      return existingLink.get();
     }
 
     long internalId = generateInternalId(shardId);
     String shortCode = toBase62(internalId);
 
     ShortUrl newLink = new ShortUrl(internalId, shortCode, longUrl, longUrlHash, shardId);
-    newLink.setUser(user); // Set the user (can be null)
-    shortUrlRepository.save(newLink);
-    return shortCode;
+    newLink.setUser(user);
+    return shortUrlRepository.save(newLink);
   }
 
   @Transactional(readOnly = true)
