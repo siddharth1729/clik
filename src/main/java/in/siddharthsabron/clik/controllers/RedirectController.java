@@ -11,7 +11,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/a")
+@RequestMapping("/s")
 public class RedirectController {
 
     private static final Logger logger = LoggerFactory.getLogger(RedirectController.class);
