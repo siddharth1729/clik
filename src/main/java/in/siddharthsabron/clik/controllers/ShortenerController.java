@@ -5,6 +5,8 @@ import in.siddharthsabron.clik.dto.ShortenResponseDto;
 import in.siddharthsabron.clik.models.links.ShortUrl;
 import in.siddharthsabron.clik.services.ShortenerService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +51,7 @@ public class ShortenerController {
      */
     @PostMapping("/shorten")
     public ResponseEntity<ShortenResponseDto> shortenUrl(
-            @RequestBody ShortenRequest shortenRequest,
+            @RequestBody @Valid ShortenRequest shortenRequest,
             HttpSession session) {
 
         // Prefer the authenticated session; fall back to an explicit userId in the body.
@@ -57,7 +59,7 @@ public class ShortenerController {
         if (userId == null) {
             userId = shortenRequest.getUserId();
         }
-
+        
         logger.info("Shorten request — longUrl: {}, resolved userId: {}", shortenRequest.getLongUrl(), userId);
 
         ShortUrl shortUrl = shortenerService.shortenUrl(shortenRequest.getLongUrl(), userId);
