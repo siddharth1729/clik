@@ -1,0 +1,50 @@
+2026-04-09T01:43:56.515+05:30  INFO 6044 --- [clik] [restartedMain] i.siddharthsabron.clik.ClikApplication   : Starting ClikApplication using Java 21.0.3 with PID 6044 (/Users/legion/work/projects/clik/target/classes started by legion in /Users/legion/work/projects/clik)
+2026-04-09T01:43:56.515+05:30  INFO 6044 --- [clik] [restartedMain] i.siddharthsabron.clik.ClikApplication   : The following 1 profile is active: "dev"
+2026-04-09T01:43:56.578+05:30  INFO 6044 --- [clik] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-09T01:43:56.582+05:30  INFO 6044 --- [clik] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 3 ms. Found 2 JPA repository interfaces.
+2026-04-09T01:43:56.626+05:30  INFO 6044 --- [clik] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-04-09T01:43:56.626+05:30  INFO 6044 --- [clik] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-09T01:43:56.626+05:30  INFO 6044 --- [clik] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2026-04-09T01:43:56.630+05:30  INFO 6044 --- [clik] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-04-09T01:43:56.630+05:30  INFO 6044 --- [clik] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 114 ms
+2026-04-09T01:43:56.644+05:30  INFO 6044 --- [clik] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-09T01:43:56.646+05:30  INFO 6044 --- [clik] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-09T01:43:56.647+05:30  INFO 6044 --- [clik] [restartedMain] o.h.e.boot.internal.EnversServiceImpl    : Envers integration enabled? : true
+2026-04-09T01:43:56.649+05:30  INFO 6044 --- [clik] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-09T01:43:56.650+05:30  INFO 6044 --- [clik] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-04-09T01:43:56.652+05:30  INFO 6044 --- [clik] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3cf9f29b
+2026-04-09T01:43:56.652+05:30  INFO 6044 --- [clik] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-04-09T01:43:56.652+05:30  WARN 6044 --- [clik] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-09T01:43:56.653+05:30  INFO 6044 --- [clik] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-3)']
+	Database driver: undefined/unknown
+	Database version: 9.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-09T01:43:56.673+05:30  INFO 6044 --- [clik] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-09T01:43:56.695+05:30  INFO 6044 --- [clik] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-09T01:43:56.735+05:30  INFO 6044 --- [clik] [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2026-04-09T01:43:56.756+05:30  INFO 6044 --- [clik] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name users
+2026-04-09T01:43:56.768+05:30  INFO 6044 --- [clik] [restartedMain] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-09T01:43:56.787+05:30  INFO 6044 --- [clik] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-04-09T01:43:56.791+05:30  INFO 6044 --- [clik] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-04-09T01:43:56.793+05:30  INFO 6044 --- [clik] [restartedMain] i.siddharthsabron.clik.ClikApplication   : Started ClikApplication in 0.296 seconds (process running for 31.055)
+2026-04-09T01:43:56.794+05:30  INFO 6044 --- [clik] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-09T01:44:32.941+05:30  INFO 6044 --- [clik] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-09T01:44:32.941+05:30  INFO 6044 --- [clik] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-09T01:44:32.943+05:30  INFO 6044 --- [clik] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-04-09T01:44:33.090+05:30 ERROR 6044 --- [clik] [http-nio-8080-exec-3] i.s.c.exceptions.GlobalExceptionHandler  : An error occurred: No static resource favicon.ico.
+2026-04-09T01:44:33.096+05:30  WARN 6044 --- [clik] [http-nio-8080-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource favicon.ico.]
+2026-04-09T01:44:46.843+05:30  INFO 6044 --- [clik] [http-nio-8080-exec-4] i.s.clik.controllers.UserController      : User logged in: siddharth.sabron@gmail.com
+2026-04-09T01:44:46.921+05:30  INFO 6044 --- [clik] [http-nio-8080-exec-5] i.s.clik.controllers.UserController      : Fetched 8 links for session user: siddharth.sabron@gmail.com
+2026-04-09T01:44:56.531+05:30  INFO 6044 --- [clik] [http-nio-8080-exec-6] i.s.c.controllers.ShortenerController    : Shorten request — longUrl: https://siddharthsabron.in, resolved userId: 2
+2026-04-09T01:44:56.549+05:30  INFO 6044 --- [clik] [http-nio-8080-exec-6] i.s.clik.services.ShortenerService       : Shortening URL for user: 2
+2026-04-09T01:44:56.567+05:30  INFO 6044 --- [clik] [http-nio-8080-exec-6] i.s.c.controllers.ShortenerController    : Short URL created: http://localhost:8080/s/l9Sw9GA0eZ
+2026-04-09T01:44:56.580+05:30  INFO 6044 --- [clik] [http-nio-8080-exec-7] i.s.clik.controllers.UserController      : Fetched 8 links for session user: siddharth.sabron@gmail.com
+2026-04-09T01:45:28.166+05:30  INFO 6044 --- [clik] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-09T01:45:28.171+05:30  INFO 6044 --- [clik] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-04-09T01:45:28.175+05:30  INFO 6044 --- [clik] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-09T01:45:28.176+05:30  INFO 6044 --- [clik] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-04-09T01:45:28.178+05:30  INFO 6044 --- [clik] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
