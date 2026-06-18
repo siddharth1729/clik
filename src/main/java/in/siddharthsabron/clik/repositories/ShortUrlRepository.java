@@ -20,19 +20,24 @@ import java.util.Optional;
 @Repository
 public interface ShortUrlRepository extends JpaRepository<ShortUrl, Long> {
 
-    Optional<ShortUrl> findByShardIdAndInternalId(Integer shardId, Long internalId);
-    Optional<ShortUrl> findByShardIdAndShortCode(Integer shardId, String shortCode);
-    Optional<ShortUrl> findByInternalId(Long internalId);
+  Optional<ShortUrl> findByShardIdAndInternalId(Integer shardId, Long internalId);
 
-    // Pessimistic Locking
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT l FROM ShortUrl l WHERE l.shardId = :shardId AND l.longUrlHash = :longUrlHash") // Use *entity* name (ShortUrl), not table name (short_urls)
-    Optional<ShortUrl> findByShardIdAndLongUrlHashForUpdate(Integer shardId, byte[] longUrlHash);
+  Optional<ShortUrl> findByShardIdAndShortCode(Integer shardId, String shortCode);
 
-    @Modifying
-    @Transactional
-    @Query(value = "UPDATE short_urls SET click_count = COALESCE(click_count, 0) + 1 WHERE shard_id = :shardId AND internal_id = :internalId", nativeQuery = true)
-    int incrementClickCount(Integer shardId, Long internalId);
+  Optional<ShortUrl> findByInternalId(Long internalId);
 
-    List<ShortUrl> findAllByUser_UserId(Long userId);
+  // Pessimistic Locking
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT l FROM ShortUrl l WHERE l.shardId = :shardId AND l.longUrlHash = :longUrlHash") // Use *entity* name
+                                                                                                 // (ShortUrl), not
+                                                                                                 // table name
+                                                                                                 // (short_urls)
+  Optional<ShortUrl> findByShardIdAndLongUrlHashForUpdate(Integer shardId, byte[] longUrlHash);
+
+  @Modifying
+  @Transactional
+  @Query(value = "UPDATE short_urls SET click_count = COALESCE(click_count, 0) + 1 WHERE shard_id = :shardId AND internal_id = :internalId", nativeQuery = true)
+  int incrementClickCount(Integer shardId, Long internalId);
+
+  List<ShortUrl> findAllByUser_UserId(Long userId);
 }

@@ -10,9 +10,9 @@ import org.hibernate.validator.constraints.URL;
  */
 @Data
 public class ShortenRequest {
-    
-    @NotBlank(message = "URL cannot be blank")
-    @URL(message = "Please provide a valid URL format")
-    private String longUrl;
-    private Long userId;
+
+  @NotBlank(message = "URL cannot be blank")
+  @URL(message = "Please provide a valid URL format")
+  private String longUrl;
+  private Long userId;
 }

@@ -20,61 +20,63 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class ShortenerController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShortenerController.class);
+  private static final Logger logger = LoggerFactory.getLogger(ShortenerController.class);
 
-    /**
-     * Injected from application.properties: app.base-url
-     * Falls back to http://localhost:8080 when the property is absent (local dev).
-     */
-    @Value("${app.base-url:http://localhost:8080}")
-    private String baseUrl;
+  /**
+   * Injected from application.properties: app.base-url
+   * Falls back to http://localhost:8080 when the property is absent (local dev).
+   */
+  @Value("${app.base-url:http://localhost:8080}")
+  private String baseUrl;
 
-    private final ShortenerService shortenerService;
+  private final ShortenerService shortenerService;
 
-    public ShortenerController(ShortenerService shortenerService) {
-        this.shortenerService = shortenerService;
+  public ShortenerController(ShortenerService shortenerService) {
+    this.shortenerService = shortenerService;
+  }
+
+  /**
+   * Shortens a long URL.
+   *
+   * <p>
+   * User resolution order:
+   * <ol>
+   * <li>HttpSession — set automatically on login; works for browser clients.</li>
+   * <li>Request body {@code userId} — backwards-compatible for API clients.</li>
+   * <li>Neither present → anonymous link (user_id = NULL in DB).</li>
+   * </ol>
+   *
+   * @param shortenRequest Body containing {@code longUrl} and an optional
+   *                       {@code userId}.
+   * @param session        The current HTTP session (may be new/empty).
+   * @return {@link ShortenResponseDto} with the full short URL and live stats.
+   */
+  @PostMapping("/shorten")
+  public ResponseEntity<ShortenResponseDto> shortenUrl(
+      @RequestBody @Valid ShortenRequest shortenRequest,
+      HttpSession session) {
+
+    // Prefer the authenticated session; fall back to an explicit userId in the
+    // body.
+    Long userId = (Long) session.getAttribute("userId");
+    if (userId == null) {
+      userId = shortenRequest.getUserId();
     }
 
-    /**
-     * Shortens a long URL.
-     *
-     * <p>User resolution order:
-     * <ol>
-     *   <li>HttpSession — set automatically on login; works for browser clients.</li>
-     *   <li>Request body {@code userId} — backwards-compatible for API clients.</li>
-     *   <li>Neither present → anonymous link (user_id = NULL in DB).</li>
-     * </ol>
-     *
-     * @param shortenRequest Body containing {@code longUrl} and an optional {@code userId}.
-     * @param session        The current HTTP session (may be new/empty).
-     * @return {@link ShortenResponseDto} with the full short URL and live stats.
-     */
-    @PostMapping("/shorten")
-    public ResponseEntity<ShortenResponseDto> shortenUrl(
-            @RequestBody @Valid ShortenRequest shortenRequest,
-            HttpSession session) {
+    logger.info("Shorten request — longUrl: {}, resolved userId: {}", shortenRequest.getLongUrl(), userId);
 
-        // Prefer the authenticated session; fall back to an explicit userId in the body.
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
-            userId = shortenRequest.getUserId();
-        }
-        
-        logger.info("Shorten request — longUrl: {}, resolved userId: {}", shortenRequest.getLongUrl(), userId);
+    ShortUrl shortUrl = shortenerService.shortenUrl(shortenRequest.getLongUrl(), userId);
 
-        ShortUrl shortUrl = shortenerService.shortenUrl(shortenRequest.getLongUrl(), userId);
+    String fullShortUrl = baseUrl + "/s/" + shortUrl.getShortCode();
+    logger.info("Short URL created: {}", fullShortUrl);
 
-        String fullShortUrl = baseUrl + "/s/" + shortUrl.getShortCode();
-        logger.info("Short URL created: {}", fullShortUrl);
+    ShortenResponseDto response = new ShortenResponseDto(
+        fullShortUrl,
+        shortUrl.getShortCode(),
+        shortUrl.getLongUrl(),
+        shortUrl.getClickCount(),
+        shortUrl.getCreatedAt());
 
-        ShortenResponseDto response = new ShortenResponseDto(
-                fullShortUrl,
-                shortUrl.getShortCode(),
-                shortUrl.getLongUrl(),
-                shortUrl.getClickCount(),
-                shortUrl.getCreatedAt()
-        );
-
-        return ResponseEntity.ok(response);
-    }
+    return ResponseEntity.ok(response);
+  }
 }

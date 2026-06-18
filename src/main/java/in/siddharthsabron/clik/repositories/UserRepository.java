@@ -15,10 +15,10 @@ import java.util.Optional;
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
+  Optional<User> findByEmail(String email);
 
-    Optional<User> findByUserId(Long userId);
+  Optional<User> findByUserId(Long userId);
 
-    @Query("SELECT s FROM ShortUrl s JOIN s.user u WHERE u.email = :email")
-    List<ShortUrl> findAllShortUrlsByUserEmail(@Param("email") String email);
+  @Query("SELECT s FROM ShortUrl s JOIN s.user u WHERE u.email = :email")
+  List<ShortUrl> findAllShortUrlsByUserEmail(@Param("email") String email);
 }

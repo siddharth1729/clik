@@ -16,25 +16,23 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class AuditMetadata implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+  @CreatedDate
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+  @LastModifiedDate
+  @Column(name = "updated_at", nullable = false)
+  private Instant updatedAt;
 
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
 
-    public Instant getCreatedAt(){
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt(){
-        return updatedAt;
-    }
-
+  public Instant getUpdatedAt() {
+    return updatedAt;
+  }
 
 }
