@@ -1,0 +1,69 @@
+2026-06-14T22:30:23.866+05:30  INFO 16986 --- [clik] [restartedMain] i.siddharthsabron.clik.ClikApplication   : Starting ClikApplication using Java 21.0.3 with PID 16986 (/Users/legion/work/projects/clik/target/classes started by legion in /Users/legion/work/projects/clik)
+2026-06-14T22:30:23.867+05:30  INFO 16986 --- [clik] [restartedMain] i.siddharthsabron.clik.ClikApplication   : The following 1 profile is active: "dev"
+2026-06-14T22:30:23.888+05:30  INFO 16986 --- [clik] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-06-14T22:30:23.888+05:30  INFO 16986 --- [clik] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-06-14T22:30:24.182+05:30  INFO 16986 --- [clik] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-14T22:30:24.199+05:30  INFO 16986 --- [clik] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 2 JPA repository interfaces.
+2026-06-14T22:30:24.438+05:30  INFO 16986 --- [clik] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-06-14T22:30:24.444+05:30  INFO 16986 --- [clik] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-14T22:30:24.445+05:30  INFO 16986 --- [clik] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2026-06-14T22:30:24.462+05:30  INFO 16986 --- [clik] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-06-14T22:30:24.463+05:30  INFO 16986 --- [clik] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 575 ms
+2026-06-14T22:30:24.525+05:30  INFO 16986 --- [clik] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-14T22:30:24.552+05:30  INFO 16986 --- [clik] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2026-06-14T22:30:24.567+05:30  INFO 16986 --- [clik] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-06-14T22:30:24.599+05:30  INFO 16986 --- [clik] [restartedMain] o.h.e.boot.internal.EnversServiceImpl    : Envers integration enabled? : true
+2026-06-14T22:30:24.669+05:30  INFO 16986 --- [clik] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-14T22:30:24.682+05:30  INFO 16986 --- [clik] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-14T22:30:24.944+05:30  INFO 16986 --- [clik] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@20543470
+2026-06-14T22:30:24.946+05:30  INFO 16986 --- [clik] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-14T22:30:25.005+05:30  WARN 16986 --- [clik] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-14T22:30:25.013+05:30  INFO 16986 --- [clik] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 9.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-14T22:30:25.359+05:30  INFO 16986 --- [clik] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-14T22:30:25.456+05:30  INFO 16986 --- [clik] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-14T22:30:25.569+05:30  INFO 16986 --- [clik] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-06-14T22:30:25.866+05:30  INFO 16986 --- [clik] [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2026-06-14T22:30:25.932+05:30  INFO 16986 --- [clik] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name users
+2026-06-14T22:30:26.072+05:30  INFO 16986 --- [clik] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-06-14T22:30:26.085+05:30  INFO 16986 --- [clik] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-06-14T22:30:26.089+05:30  INFO 16986 --- [clik] [restartedMain] i.siddharthsabron.clik.ClikApplication   : Started ClikApplication in 2.382 seconds (process running for 2.586)
+2026-06-14T22:32:35.935+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-14T22:32:35.936+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-14T22:32:35.940+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 4 ms
+2026-06-14T22:32:36.894+05:30 ERROR 16986 --- [clik] [http-nio-8080-exec-3] i.s.c.exceptions.GlobalExceptionHandler  : An error occurred: No static resource favicon.ico.
+2026-06-14T22:32:36.901+05:30  WARN 16986 --- [clik] [http-nio-8080-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource favicon.ico.]
+2026-06-14T22:32:51.234+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-4] i.s.clik.controllers.UserController      : User logged in: siddharth.sabron@gmail.com
+2026-06-14T22:32:51.491+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-5] i.s.clik.controllers.UserController      : Fetched 22959 links for session user: siddharth.sabron@gmail.com
+2026-06-14T22:33:08.293+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-6] i.s.clik.controllers.UserController      : Fetched 22959 links for session user: siddharth.sabron@gmail.com
+2026-06-14T22:33:56.874+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-7] i.s.clik.controllers.UserController      : Fetched 0 links for session user: siddharth.sabron@gmail.com
+2026-06-14T22:34:20.798+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-8] i.s.c.controllers.ShortenerController    : Shorten request — longUrl: https://meet.google.com/landing, resolved userId: 2
+2026-06-14T22:34:20.824+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-8] i.s.clik.services.ShortenerService       : Shortening URL for user: 2
+2026-06-14T22:34:20.885+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-8] i.s.c.controllers.ShortenerController    : Short URL created: http://localhost:8080/s/xKs6RJ74uQ
+2026-06-14T22:34:20.895+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-9] i.s.clik.controllers.UserController      : Fetched 1 links for session user: siddharth.sabron@gmail.com
+2026-06-14T22:34:28.890+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-10] i.s.clik.controllers.RedirectController  : ====Redirecting short code: xKs6RJ74uQ to long URL
+2026-06-14T22:34:28.898+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-10] i.s.clik.services.ShortenerService       : Getting long URL for shortCode: xKs6RJ74uQ
+2026-06-14T22:34:28.899+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-10] i.s.clik.services.ShortenerService       : Looking up short URL with internalId: 456866496115650560
+2026-06-14T22:34:28.906+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-10] i.s.clik.services.ShortenerService       : =====Incrementing click count for short URL: in.siddharthsabron.clik.models.links.ShortUrl@3af0d1d1
+2026-06-14T22:34:28.906+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-10] i.s.clik.services.ShortenerService       : =====Incrementing click count for shardId: 3, ===== internalId: 456866496115650560
+2026-06-14T22:34:28.908+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-10] i.s.clik.services.ShortenerService       : =====Returning long URL: https://meet.google.com/landing
+2026-06-14T22:34:28.939+05:30  INFO 16986 --- [clik] [pool-2-thread-1] i.s.clik.services.ShortenerService       : =====Successfully incremented click count for shardId: 3, internalId: 456866496115650560
+2026-06-14T22:34:41.902+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-3] i.s.clik.controllers.RedirectController  : ====Redirecting short code: xKs6RJ74uQ to long URL
+2026-06-14T22:34:41.914+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-3] i.s.clik.services.ShortenerService       : Getting long URL for shortCode: xKs6RJ74uQ
+2026-06-14T22:34:41.915+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-3] i.s.clik.services.ShortenerService       : Looking up short URL with internalId: 456866496115650560
+2026-06-14T22:34:41.932+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-3] i.s.clik.services.ShortenerService       : =====Incrementing click count for short URL: in.siddharthsabron.clik.models.links.ShortUrl@1e8a0abe
+2026-06-14T22:34:41.932+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-3] i.s.clik.services.ShortenerService       : =====Incrementing click count for shardId: 3, ===== internalId: 456866496115650560
+2026-06-14T22:34:41.932+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-3] i.s.clik.services.ShortenerService       : =====Returning long URL: https://meet.google.com/landing
+2026-06-14T22:34:41.941+05:30  INFO 16986 --- [clik] [pool-2-thread-2] i.s.clik.services.ShortenerService       : =====Successfully incremented click count for shardId: 3, internalId: 456866496115650560
+2026-06-14T22:34:46.598+05:30  INFO 16986 --- [clik] [http-nio-8080-exec-4] i.s.clik.controllers.UserController      : Fetched 1 links for session user: siddharth.sabron@gmail.com
+2026-06-14T22:36:29.319+05:30  INFO 16986 --- [clik] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-06-14T22:36:29.324+05:30  INFO 16986 --- [clik] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-06-14T22:36:29.331+05:30  INFO 16986 --- [clik] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-14T22:36:29.336+05:30  INFO 16986 --- [clik] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-06-14T22:36:29.337+05:30  INFO 16986 --- [clik] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

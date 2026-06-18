@@ -3,7 +3,6 @@ package in.siddharthsabron.clik.services;
 import in.siddharthsabron.clik.models.links.ShortUrl;
 import in.siddharthsabron.clik.repositories.ShortUrlRepository;
 import in.siddharthsabron.clik.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,11 +39,14 @@ public class ShortenerService {
 
   private static final Logger logger = LoggerFactory.getLogger(ShortenerService.class);
 
-  @Autowired
   private ShortUrlRepository shortUrlRepository;
 
-  @Autowired
   private UserRepository userRepository;
+
+  public ShortenerService(ShortUrlRepository shortUrlRepository, UserRepository userRepository) {
+    this.shortUrlRepository = shortUrlRepository;
+    this.userRepository = userRepository;
+  }
 
   private final AtomicInteger sequence = new AtomicInteger(0);
   private final long epoch = 1672531200000L; // Example epoch
@@ -86,7 +88,8 @@ public class ShortenerService {
   }
 
   /**
-   * Internal method to handle URL shortening, shared by both user and anonymous cases.
+   * Internal method to handle URL shortening, shared by both user and anonymous
+   * cases.
    *
    * @param longUrl The URL to shorten.
    * @param user    The User object (can be null for anonymous links).
